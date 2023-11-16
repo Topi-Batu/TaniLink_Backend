@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option csharp_namespace = "TaniLink_Backend";
+
+package account;
+
+service Accounts {
+  rpc Register (RegisterReq) returns (RegisterRes);
+  rpc Login (LoginReq) returns (LoginRes);
+}
+
+message AccountDetail{
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message RegisterReq {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message RegisterRes {
+  string name = 1;
+  string status = 2;
+}
+
+message LoginReq {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginRes {
+	AccountDetail account = 1;
+	message Token {
+		string access_token = 1;
+		int32 expires = 2;
+	}
+	Token token = 2;
+}
+
