@@ -7,36 +7,58 @@ package account;
 service Accounts {
   rpc Register (RegisterReq) returns (RegisterRes);
   rpc Login (LoginReq) returns (LoginRes);
+  rpc GetUsers (Empty) returns (AccountDetail);
+  rpc GetAllRoles (Empty) returns (Roles);
+  rpc Testing (Empty) returns (Test);
+}
+
+message Empty {}
+
+enum Role {
+  Admin = 0;
+  Petani = 1;
+  Mitra = 2;
+  User = 3;
+}
+
+message Roles {
+	repeated string Role = 1;
+}
+
+message Test{
+  string Test = 1;
 }
 
 message AccountDetail{
-  int32 id = 1;
-  string name = 2;
-  string email = 3;
+  string Id = 1;
+  string FullName = 2;
+  string Email = 3;
+  string PhoneNumber = 4;
+  repeated string Role = 5;
 }
 
 message RegisterReq {
-  string name = 1;
-  string email = 2;
-  string password = 3;
+  string FullName = 1;
+  string Email = 2;
+  string Password = 3;
+  Role Role = 4;
 }
 
 message RegisterRes {
-  string name = 1;
-  string status = 2;
+  AccountDetail Account = 1;
 }
 
 message LoginReq {
-  string email = 1;
-  string password = 2;
+  string Email = 1;
+  string Password = 2;
 }
 
 message LoginRes {
-	AccountDetail account = 1;
 	message Token {
-		string access_token = 1;
-		int32 expires = 2;
+		string AccessToken = 1;
+		int32 Expires = 2;
 	}
-	Token token = 2;
+	Token Tokens = 1;
+	AccountDetail Account = 2;
 }
 
