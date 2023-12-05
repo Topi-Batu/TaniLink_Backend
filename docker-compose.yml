@@ -26,8 +26,8 @@ services:
       context: .
       dockerfile: TaniLink_Backend/Dockerfile
     ports:
-    - 3504:8080
-    - 3505:8081
+    - 3504:3504
+    - 3505:3504
     depends_on:
       - tanilink-db
     environment:
