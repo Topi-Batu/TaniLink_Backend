@@ -14,8 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http1);
-    options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http2);
+    options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http1AndHttp2);
 });
 
 // Add services to the container.
