@@ -1,0 +1,47 @@
+version: '3.4'
+
+networks:
+  tanilink-network:
+    driver: bridge
+
+services:
+  tanilink-db:
+    container_name: api-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - 8011:1433
+    environment: 
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=Express
+    restart: always
+    volumes:
+      - tanilink-db-volume:/var/opt/mssql
+    networks:
+      - tanilink-network
+
+  tanilink_backend:
+    image: ${DOCKER_REGISTRY-}tanilinkbackend
+    build:
+      context: .
+      dockerfile: TaniLink_Backend/Dockerfile
+    ports:
+    - 3504:3504
+    - 3505:3505
+    depends_on:
+      - tanilink-db
+    environment:
+      - ConnectionStrings__DefaultConnection=${KONEKSI_DB}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - MailTrap__Key=${MAILTRAP}
+    restart: always
+    volumes:
+      - tanilink-volume:/root/.aspnet/DataProtection-Keys
+    networks:
+      - tanilink-network
+
+volumes:
+  tanilink-volume:
+  tanilink-db-volume:

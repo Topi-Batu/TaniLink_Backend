@@ -1,0 +1,6 @@
+version: '3.4'
+
+services:
+  tanilink_backend:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
