@@ -22,7 +22,11 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ vars.USER_VPS }}@${{ vars.IP_VPS }} << 'EOF'
           cd ${{ vars.DIR }}
-          git checkout appsettings.json
+          if [ -f bantuin.me.crt ]; then rm bantuin.me.crt; fi
+          echo '${{ secrets.TLS_CRT }}' > bantuin.me.crt
+          if [ -f bantuin.me.key ]; then rm bantuin.me.key; fi
+          echo '${{ secrets.TLS_KEY }}' > bantuin.me.key
+          git checkout ${{ vars.DIR }}/appsettings.json
           git pull origin master
           if [ -f .env ]; then rm .env; fi
           echo '${{ vars.FILE_ENV }}' > .env
