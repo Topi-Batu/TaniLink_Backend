@@ -3,7 +3,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 443
+EXPOSE 8080
 
 COPY ["bantuin.me.crt", "/app/"]
 COPY ["bantuin.me.key", "/app/"]

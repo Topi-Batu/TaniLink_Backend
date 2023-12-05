@@ -8,4 +8,4 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/bantuin.me.crt
       - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=/app/bantuin.me.key
     ports:
-      - "443"
+      - "8080"
