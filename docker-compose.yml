@@ -37,6 +37,8 @@ services:
       - Jwt__Audience=${JWT_AUDIENCE}
       - MailTrap__Key=${MAILTRAP}
     restart: always
+    volumes:
+      - tanilink-volume:/app
     networks:
       - tanilink-network
 
