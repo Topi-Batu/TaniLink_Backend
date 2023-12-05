@@ -21,9 +21,9 @@ jobs:
     - name: Deploy to VPS
       run: |
         ssh -o StrictHostKeyChecking=no ${{ vars.USER_VPS }}@${{ vars.IP_VPS }} << 'EOF'
+          cd ${{ vars.DIR }}
           git checkout ${{ vars.DIR }}/appsettings.json
           git pull origin master
-          cd ${{ vars.DIR }}
           if [ -f bantuin.me.crt ]; then rm bantuin.me.crt; fi
           echo '${{ secrets.TLS_CRT }}' > bantuin.me.crt
           if [ -f bantuin.me.key ]; then rm bantuin.me.key; fi
