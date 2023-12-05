@@ -36,8 +36,6 @@ services:
       - Jwt__Audience=${JWT_AUDIENCE}
       - MailTrap__Key=${MAILTRAP}
     restart: always
-    volumes:
-      - tanilink-volume:.aspnet/DataProtection-Keys
     networks:
       - tanilink-network
 
