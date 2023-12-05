@@ -38,7 +38,7 @@ services:
       - MailTrap__Key=${MAILTRAP}
     restart: always
     volumes:
-      - tanilink-volume:/home/app/.aspnet/DataProtection-Keys
+      - tanilink-volume:~/.aspnet/DataProtection-Keys
     networks:
       - tanilink-network
 
