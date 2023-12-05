@@ -12,10 +12,14 @@ using TaniLink_Backend.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
+/*builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http1AndHttp2);
-});
+    options.ConfigureEndpointDefaults(lo => 
+    { 
+        lo.Protocols = HttpProtocols.Http1AndHttp2;
+        lo.UseHttps("/app/bantuin.me.crt", "/app/bantuin.me.key");
+    });
+});*/
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
