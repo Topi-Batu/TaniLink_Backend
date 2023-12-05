@@ -26,8 +26,7 @@ services:
       context: .
       dockerfile: TaniLink_Backend/Dockerfile
     ports:
-    - 3504:3504
-    - 3505:3504
+    - 3504:8080
     depends_on:
       - tanilink-db
     environment:
@@ -38,7 +37,7 @@ services:
       - MailTrap__Key=${MAILTRAP}
     restart: always
     volumes:
-      - tanilink-volume:/home/app/.aspnet/DataProtection-Keys
+      - tanilink-volume:.aspnet/DataProtection-Keys
     networks:
       - tanilink-network
 
