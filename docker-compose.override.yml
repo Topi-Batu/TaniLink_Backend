@@ -4,3 +4,6 @@ services:
   tanilink_backend:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8080"
+      - "8081" 
