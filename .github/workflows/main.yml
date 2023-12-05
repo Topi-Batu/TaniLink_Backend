@@ -30,8 +30,8 @@ jobs:
           docker compose up -d
           if [ -f appsettings.json ]; then rm appsettings.json; fi
           echo '${{ vars.APP_SETTINGS }}' > appsettings.json
-          mv docker-compose.dcproj temp/
-          dotnet ef database update
-          mv temp/docker-compose.dcproj .
+          # mv docker-compose.dcproj temp/
+          dotnet ef database update --project TaniLink_Backend
+          # mv temp/docker-compose.dcproj .
           echo 'Deployment Completed.'
         EOF
