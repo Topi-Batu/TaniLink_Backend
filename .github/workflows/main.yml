@@ -28,8 +28,10 @@ jobs:
           echo '${{ vars.FILE_ENV }}' > .env
           sudo docker compose build --no-cache
           sudo docker compose up -d
+          cd ${{ vars.DIR }}
           if [ -f appsettings.json ]; then rm appsettings.json; fi
           echo '${{ vars.APP_SETTINGS }}' > appsettings.json
+          cd ..
           # mv docker-compose.dcproj temp/
           dotnet ef database update --project TaniLink_Backend
           # mv temp/docker-compose.dcproj .
