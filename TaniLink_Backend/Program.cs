@@ -17,7 +17,7 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ConfigureEndpointDefaults(lo =>
     {
         lo.Protocols = HttpProtocols.Http1AndHttp2;
-        lo.UseHttps("bantuin.me.crt", "bantuin.me.key");
+        lo.UseHttps("file:///app/bantuin.me.crt", "file:///app/bantuin.me.key");
     });
 });
 
