@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 using TaniLink_Backend.Interfaces;
 using TaniLink_Backend.Models;
 
@@ -14,18 +16,21 @@ namespace TaniLink_Backend.Controllers.GrpcServices
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ITokenRepository _tokenRepository;
+        private readonly ISendMailRepository _sendMailRepository;
 
         public AccountService(IMapper mapper, 
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager,
             IConfiguration configuration,
-            ITokenRepository tokenRepository)
+            ITokenRepository tokenRepository,
+            ISendMailRepository sendMailRepository)
         {
             _mapper = mapper;
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _tokenRepository = tokenRepository;
+            _sendMailRepository = sendMailRepository;
         }
         public override async Task<RegisterRes> Register(RegisterReq request, ServerCallContext context)
         {
@@ -41,10 +46,11 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                 var result = await _userManager.CreateAsync(userAdd, request.Password);
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(userAdd, "User");/*
+                    await _userManager.AddToRoleAsync(userAdd, "User");
                     var sendMail = await _sendMailRepository.SendVerificationEmail(request.Email);
                     if (!sendMail)
-                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to send verification email"));*/
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to send verification email"));
+                    
                     var accountDetail = _mapper.Map<AccountDetail>(userAdd);
                     foreach (var role in await _userManager.GetRolesAsync(userAdd))
                     {
@@ -112,7 +118,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
             }
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "User, Admin")]
         public override async Task<Test> Testing(Empty request, ServerCallContext context)
         {
             return new Test
@@ -121,7 +127,32 @@ namespace TaniLink_Backend.Controllers.GrpcServices
             };
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public override async Task<AccountDetail> GetProfile(Empty request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.Email)!.Value);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
 
+                var accountDetail = _mapper.Map<AccountDetail>(user);
+                foreach (var role in await _userManager.GetRolesAsync(user))
+                {
+                    accountDetail.Role.Add(role);
+                }
+
+                return accountDetail;
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
 
     }
 }
