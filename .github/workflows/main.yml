@@ -34,8 +34,7 @@ jobs:
           echo '${{ vars.APP_SETTINGS }}' > ${{ vars.DIR }}/appsettings.json
           sudo docker compose build --no-cache
           sudo docker compose up -d
-          # mv docker-compose.dcproj temp/
-          dotnet ef database update --project TaniLink_Backend
-          # mv temp/docker-compose.dcproj .
+          cd ${{ vars.DIR }}
+          dotnet ef database update
           echo 'Deployment Completed.'
         EOF
