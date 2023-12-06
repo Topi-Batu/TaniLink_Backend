@@ -12,18 +12,10 @@ using TaniLink_Backend.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/*builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ConfigureEndpointDefaults(lo =>
-    {
-        lo.Protocols = HttpProtocols.Http1AndHttp2;
-        lo.UseHttps("file://bantuin.me.crt", "file://bantuin.me.key");
-    });
-});*/
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddGrpc();
+builder.Services.AddScoped<ISendMailRepository, SendMailRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<Seed>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
