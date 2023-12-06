@@ -3,11 +3,13 @@ version: '3.4'
 services:
   tanilink_backend:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/bantuin.me.crt
-      - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=/app/bantuin.me.key
-      - ASPNETCORE_Kestrel__Certificates__Default__Protocols=Http2
-    ports:
-      - "443"
-      - "80"
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${TLS_CRT}
+      - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=${TLS_KEY}
+      - ASPNETCORE_Kestrel__Certificates__Default__Protocols=Http1AndHttp2
+      - ConnectionStrings__DefaultConnection=${KONEKSI_DB}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - MailTrap__Key=${MAILTRAP}

@@ -6,7 +6,7 @@ networks:
 
 services:
   tanilink-db:
-    container_name: api-db
+    container_name: tanilink-db
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - 8011:1433
@@ -30,12 +30,6 @@ services:
     - 3505:443
     depends_on:
       - tanilink-db
-    environment:
-      - ConnectionStrings__DefaultConnection=${KONEKSI_DB}
-      - Jwt__Key=${JWT_KEY}
-      - Jwt__Issuer=${JWT_ISSUER}
-      - Jwt__Audience=${JWT_AUDIENCE}
-      - MailTrap__Key=${MAILTRAP}
     restart: always
     volumes:
       - tanilink-volume:/app
