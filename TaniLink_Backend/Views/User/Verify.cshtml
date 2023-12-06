@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Email Verification";
+}
+
+<div class="text-center">
+    @if (ViewBag.IsSuccess != null)
+    {
+        if ((bool)ViewBag.IsSuccess)
+        {
+            <h1 class="display-4">Success</h1>
+            <p>Your email has been confirmed successfully</p>
+        }
+        else
+        {
+            <h1 class="display-4">Failed</h1>
+            <p>@ViewBag.Message</p>
+        }
+    }
+    
+</div>
