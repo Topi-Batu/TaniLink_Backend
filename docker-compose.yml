@@ -32,7 +32,7 @@ services:
       - tanilink-db
     restart: always
     volumes:
-      - tanilink-volume:/app
+      - tanilink-volume:/home/app/.aspnet/DataProtection-Keys
     networks:
       - tanilink-network
 
