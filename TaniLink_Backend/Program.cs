@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TaniLink_Backend;
 using TaniLink_Backend.Controllers.GrpcServices;
+using TaniLink_Backend.Controllers.SignalRHubs;
 using TaniLink_Backend.Data;
 using TaniLink_Backend.Interfaces;
 using TaniLink_Backend.Models;
@@ -15,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddGrpc();
+builder.Services.AddSignalR();
 builder.Services.AddScoped<ISendMailRepository, SendMailRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<Seed>();
@@ -108,6 +110,7 @@ app.MapGrpcService<AccountService>();
 
 app.UseAuthorization();
 
+app.MapHub<ChatHub>("/ChatHub");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
