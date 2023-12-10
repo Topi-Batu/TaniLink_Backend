@@ -12,8 +12,8 @@ using TaniLink_Backend.Data;
 namespace TaniLink_Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231204005713_AddFullName")]
-    partial class AddFullName
+    [Migration("20231208014605_AddArea")]
+    partial class AddArea
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace TaniLink_Backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("AreaUser", b =>
+                {
+                    b.Property<string>("AreasId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AreasId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("AreaUser");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -164,8 +179,11 @@ namespace TaniLink_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Kecamatan")
                         .HasColumnType("nvarchar(max)");
@@ -176,15 +194,10 @@ namespace TaniLink_Backend.Migrations
                     b.Property<string>("Provinsi")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Areas");
                 });
@@ -199,6 +212,9 @@ namespace TaniLink_Backend.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConnectionId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -260,6 +276,21 @@ namespace TaniLink_Backend.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("AreaUser", b =>
+                {
+                    b.HasOne("TaniLink_Backend.Models.Area", null)
+                        .WithMany()
+                        .HasForeignKey("AreasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaniLink_Backend.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -309,20 +340,6 @@ namespace TaniLink_Backend.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("TaniLink_Backend.Models.Area", b =>
-                {
-                    b.HasOne("TaniLink_Backend.Models.User", "User")
-                        .WithMany("Areas")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TaniLink_Backend.Models.User", b =>
-                {
-                    b.Navigation("Areas");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,8 +12,8 @@ using TaniLink_Backend.Data;
 namespace TaniLink_Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231116142200_AddPicture")]
-    partial class AddPicture
+    [Migration("20231208015105_AddCommodity")]
+    partial class AddCommodity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,36 @@ namespace TaniLink_Backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("AreaCommodity", b =>
+                {
+                    b.Property<string>("AreasId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CommoditiesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AreasId", "CommoditiesId");
+
+                    b.HasIndex("CommoditiesId");
+
+                    b.ToTable("AreaCommodity");
+                });
+
+            modelBuilder.Entity("AreaUser", b =>
+                {
+                    b.Property<string>("AreasId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AreasId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("AreaUser");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -158,6 +188,61 @@ namespace TaniLink_Backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("TaniLink_Backend.Models.Area", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Kecamatan")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Kota")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Provinsi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Areas");
+                });
+
+            modelBuilder.Entity("TaniLink_Backend.Models.Commodity", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Commodities");
+                });
+
             modelBuilder.Entity("TaniLink_Backend.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -170,12 +255,18 @@ namespace TaniLink_Backend.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ConnectionId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -201,7 +292,6 @@ namespace TaniLink_Backend.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Picture")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
@@ -225,6 +315,36 @@ namespace TaniLink_Backend.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("AreaCommodity", b =>
+                {
+                    b.HasOne("TaniLink_Backend.Models.Area", null)
+                        .WithMany()
+                        .HasForeignKey("AreasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaniLink_Backend.Models.Commodity", null)
+                        .WithMany()
+                        .HasForeignKey("CommoditiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AreaUser", b =>
+                {
+                    b.HasOne("TaniLink_Backend.Models.Area", null)
+                        .WithMany()
+                        .HasForeignKey("AreasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaniLink_Backend.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
