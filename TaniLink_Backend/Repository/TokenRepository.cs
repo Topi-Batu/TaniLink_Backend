@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -18,7 +17,7 @@ namespace TaniLink_Backend.Repository
             IConfiguration configuration)
         {
             _userManager = userManager;
-           _configuration = configuration;
+            _configuration = configuration;
         }
         public async Task<string> CreateAccessToken(User user)
         {

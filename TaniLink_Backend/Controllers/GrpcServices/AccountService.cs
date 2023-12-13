@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
         private readonly ITokenRepository _tokenRepository;
         private readonly ISendMailRepository _sendMailRepository;
 
-        public AccountService(IMapper mapper, 
+        public AccountService(IMapper mapper,
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager,
             IConfiguration configuration,
@@ -50,7 +51,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                     var sendMail = await _sendMailRepository.SendVerificationEmail(request.Email);
                     if (!sendMail)
                         throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to send verification email"));
-                    
+
                     var accountDetail = _mapper.Map<AccountDetail>(userAdd);
                     foreach (var role in await _userManager.GetRolesAsync(userAdd))
                     {
@@ -153,6 +154,8 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                 throw new RpcException(new Status(StatusCode.Internal, ex.Message));
             }
         }
+
+
 
     }
 }

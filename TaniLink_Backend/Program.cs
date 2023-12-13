@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TaniLink_Backend;
@@ -14,6 +12,7 @@ using TaniLink_Backend.Repository;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddLogging();
 builder.Services.AddControllersWithViews();
 builder.Services.AddGrpc();
 builder.Services.AddSignalR();
@@ -21,7 +20,8 @@ builder.Services.AddScoped<ISendMailRepository, SendMailRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<Seed>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddDbContext<ApplicationDbContext>(options => {
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
