@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+option csharp_namespace = "TaniLink_Backend";
+
+package marketplace_proto;
+
+import "google/protobuf/empty.proto";
+
+service Marketplace {
+  rpc GetAllProduct (google.protobuf.Empty) returns (ProductDetail);
+  rpc GetProductById (IdReq) returns (ProductDetail);
+  rpc GetProductByCommodityId (IdReq) returns (ProductDetail);
+  rpc GetProductByAreaId (IdReq) returns (ProductDetail);
+  rpc GetProductBySellerId (IdReq) returns (ProductDetail);
+  rpc GetProductByPriceRange (PriceRange) returns (ProductDetail);
+  rpc SearchProduct(Query) returns (ProductDetail);
+  rpc GetUserShoppingCarts (google.protobuf.Empty) returns (ShoppingCartDetail);
+  rpc GetUserOrders (google.protobuf.Empty) returns (OrderDetail);
+  rpc AddProductToShoppingCart (IdReq) returns (ShoppingCartDetail);
+  rpc RemoveProductFromShoppingCart (IdReq) returns (ShoppingCartDetail);
+  rpc Checkout (google.protobuf.Empty) returns (OrderDetail);
+  rpc CancelOrder (IdReq) returns (OrderDetail);
+  rpc ConfirmOrder (IdReq) returns (OrderDetail);
+  rpc GetOrderById (IdReq) returns (OrderDetail);
+
+}
+
+enum InvoiceStatus {
+	PAID = 0;
+	UNPAID = 1;
+}
+
+enum OrderStatus{
+	ACCEPTED = 0;
+	PROCESSING = 1;
+	DELIVERING = 2;
+	DELIVERED = 3;
+	FINISHED = 4;
+	CANCELLED = 5;
+}
+
+message IdReq {
+	string Id = 1;
+}
+
+message ProductDetail {
+	string Id = 1;
+	string Name = 2;
+	string Price = 3;
+	int32 AvailableStock = 4;
+	int32 Sold = 5;
+	string CommodityId = 6;
+	string AreaId = 7;
+	string SellerId = 8;
+	repeated string Image = 9;
+}
+
+message PriceRange {
+	string Lower = 1;
+	string Upper = 2;
+}
+message Query {
+	string Query = 1;
+}
+
+message ShoppingCartDetail {
+	string Id = 1;
+	int32 Amount = 2;
+	int64 FinalPrice = 3;
+	ProductDetail Product = 4;
+}
+
+message OrderDetail {
+	string Id = 1;
+	string Notes = 2;
+	int64 TotalPrice = 3;
+	OrderStatus Status = 5;
+	repeated ShoppingCartDetail ShoppingCarts = 6;
+}
+
+
