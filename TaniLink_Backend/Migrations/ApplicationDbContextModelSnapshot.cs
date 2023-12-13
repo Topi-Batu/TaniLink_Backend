@@ -52,6 +52,21 @@ namespace TaniLink_Backend.Migrations
                     b.ToTable("AreaUser");
                 });
 
+            modelBuilder.Entity("InvoiceOrder", b =>
+                {
+                    b.Property<string>("InvoicesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("OrdersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("InvoicesId", "OrdersId");
+
+                    b.HasIndex("OrdersId");
+
+                    b.ToTable("InvoiceOrder");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -183,6 +198,21 @@ namespace TaniLink_Backend.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("OrderShoppingCart", b =>
+                {
+                    b.Property<string>("OrdersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ShoppingCartId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("OrdersId", "ShoppingCartId");
+
+                    b.HasIndex("ShoppingCartId");
+
+                    b.ToTable("OrderShoppingCart");
                 });
 
             modelBuilder.Entity("TaniLink_Backend.Models.Address", b =>
@@ -329,6 +359,36 @@ namespace TaniLink_Backend.Migrations
                     b.ToTable("ConversationMembers");
                 });
 
+            modelBuilder.Entity("TaniLink_Backend.Models.Invoice", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TotalPrice")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("XenditInvoiceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Invoices");
+                });
+
             modelBuilder.Entity("TaniLink_Backend.Models.Message", b =>
                 {
                     b.Property<string>("Id")
@@ -393,8 +453,11 @@ namespace TaniLink_Backend.Migrations
                     b.Property<string>("AddressId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
+                    b.Property<string>("CourierName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CourierPhoneNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
@@ -402,11 +465,11 @@ namespace TaniLink_Backend.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<long>("DeliveryPrice")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShoppingCartId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -414,11 +477,12 @@ namespace TaniLink_Backend.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int>("Weight")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
-
-                    b.HasIndex("ShoppingCartId");
 
                     b.ToTable("Orders");
                 });
@@ -447,13 +511,13 @@ namespace TaniLink_Backend.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Price")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("SellerId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("Sold")
                         .HasColumnType("int");
 
                     b.Property<string>("UnitName")
@@ -678,6 +742,21 @@ namespace TaniLink_Backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("InvoiceOrder", b =>
+                {
+                    b.HasOne("TaniLink_Backend.Models.Invoice", null)
+                        .WithMany()
+                        .HasForeignKey("InvoicesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaniLink_Backend.Models.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrdersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -725,6 +804,21 @@ namespace TaniLink_Backend.Migrations
                     b.HasOne("TaniLink_Backend.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OrderShoppingCart", b =>
+                {
+                    b.HasOne("TaniLink_Backend.Models.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrdersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaniLink_Backend.Models.ShoppingCart", null)
+                        .WithMany()
+                        .HasForeignKey("ShoppingCartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -797,14 +891,7 @@ namespace TaniLink_Backend.Migrations
                         .HasForeignKey("AddressId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("TaniLink_Backend.Models.ShoppingCart", "ShoppingCart")
-                        .WithMany("Orders")
-                        .HasForeignKey("ShoppingCartId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Address");
-
-                    b.Navigation("ShoppingCart");
                 });
 
             modelBuilder.Entity("TaniLink_Backend.Models.Product", b =>
@@ -861,7 +948,7 @@ namespace TaniLink_Backend.Migrations
                     b.HasOne("TaniLink_Backend.Models.User", "User")
                         .WithMany("ShoppingCarts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Product");
 
@@ -907,11 +994,6 @@ namespace TaniLink_Backend.Migrations
             modelBuilder.Entity("TaniLink_Backend.Models.Seller", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("TaniLink_Backend.Models.ShoppingCart", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("TaniLink_Backend.Models.User", b =>
