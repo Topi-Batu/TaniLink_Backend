@@ -7,10 +7,10 @@ namespace TaniLink_Backend.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? Id { get; set; }
         public string? Name { get; set; }
-        public string? Price { get; set; }
+        public long Price { get; set; }
         public string? UnitName { get; set; }
         public int AvailableStock { get; set; }
-        public int Status { get; set; }
+        public int Sold { get; set; }
         public Commodity? Commodity { get; set; }
         public Area? Area { get; set; }
         public Seller? Seller { get; set; }

@@ -18,6 +18,7 @@ namespace TaniLink_Backend.Data
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<ConversationMember> ConversationMembers { get; set; }
         public DbSet<Message> Messages { get; set; }
@@ -32,10 +33,14 @@ namespace TaniLink_Backend.Data
                 .HasOne(sc => sc.Product)
                 .WithMany(p => p.ShoppingCarts)
                 .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.ShoppingCart)
-                .WithMany(sc => sc.Orders)
+            modelBuilder.Entity<ShoppingCart>()
+                .HasOne(sc => sc.User)
+                .WithMany(u => u.ShoppingCarts)
                 .OnDelete(DeleteBehavior.Restrict);
+            /*modelBuilder.Entity<Order>()
+                .HasMany(o => o.ShoppingCart)
+                .WithMany(p => p.Orders)
+                .UsingEntity(j => j.ToTable("OrderShoppingCart"));*/
             base.OnModelCreating(modelBuilder);
         }
 

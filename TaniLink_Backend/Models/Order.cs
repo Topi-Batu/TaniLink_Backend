@@ -6,10 +6,15 @@ namespace TaniLink_Backend.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? Id { get; set; }
-        public int Amount { get; set; }
         public string? Notes { get; set; }
-        public int Status { get; set; }
-        public ShoppingCart? ShoppingCart { get; set; }
+        public OrderStatus Status { get; set; }
+        public long DeliveryPrice { get; set; }
+        public int Weight { get; set; }
+        public string? CourierName { get; set; }
+        public string? CourierPhoneNumber { get; set; }
         public Address? Address { get; set; }
+        public ICollection<ShoppingCart>? ShoppingCart { get; set; }
+        public ICollection<Invoice>? Invoices { get; set; }
+
     }
 }
