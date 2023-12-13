@@ -20,21 +20,35 @@ services:
     networks:
       - tanilink-network
 
+  tanilink-ml:
+    container_name: tanilink-ml
+    image: ${DOCKER_REGISTRY-}tanilinkml
+    build:
+      context: .
+      dockerfile: TaniLink_ML/Dockerfile
+    ports:
+    - 3504:80
+    depends_on:
+      - tanilink-db
+    restart: always
+    networks:
+      - tanilink-network
+
   tanilink_backend:
     image: ${DOCKER_REGISTRY-}tanilinkbackend
     build:
       context: .
       dockerfile: TaniLink_Backend/Dockerfile
     ports:
-    - 3504:80
     - 3505:443
     depends_on:
-      - tanilink-db
+      - tanilink-ml
     restart: always
     volumes:
       - tanilink-volume:/home/app/.aspnet/DataProtection-Keys
     networks:
       - tanilink-network
+
 
 volumes:
   tanilink-volume:

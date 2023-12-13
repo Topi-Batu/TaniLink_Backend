@@ -4,7 +4,7 @@ services:
   tanilink_backend:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=https://+:443
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${TLS_CRT}
       - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=${TLS_KEY}
       - ASPNETCORE_Kestrel__Certificates__Default__Protocols=Http1AndHttp2
