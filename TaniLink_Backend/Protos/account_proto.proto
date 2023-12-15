@@ -11,6 +11,8 @@ service Accounts {
   rpc Register (RegisterReq) returns (RegisterRes);
   rpc Login (LoginReq) returns (LoginRes);
   rpc GetProfile (google.protobuf.Empty) returns (AccountDetail);
+  rpc EditProfile (EditProfileReq) returns (AccountDetail);
+  rpc ChangeEmail (EmailReq) returns (google.protobuf.Empty);
   rpc IsEmailConfirmed (EmailReq) returns (google.protobuf.Empty);
   rpc ResendVerificationMail(EmailReq) returns (google.protobuf.Empty);
   rpc ForgotPassword(EmailReq) returns (google.protobuf.Empty);
@@ -26,11 +28,11 @@ enum Role {
   User = 3;
 }
 
-message EmailReq{
+message EmailReq {
 	string Email = 1;
 }
 
-message AccountDetail{
+message AccountDetail {
   string Id = 1;
   string FullName = 2;
   string Email = 3;
@@ -41,6 +43,14 @@ message AccountDetail{
   int64 Xp = 8;
   string DateOfBirth = 9;
   repeated string Role = 10;
+}
+
+message EditProfileReq {
+  string FullName = 1;
+  string PhoneNumber = 2;
+  string Picture = 3;
+  string Gender = 4;
+  string DateOfBirth = 5;
 }
 
 message RegisterReq {

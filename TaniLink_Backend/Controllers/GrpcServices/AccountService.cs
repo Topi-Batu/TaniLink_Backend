@@ -47,6 +47,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                     PhoneNumber = request.PhoneNumber,
                     DateOfBirth = DateOnly.Parse(request.DateOfBirth),
                     Gender = request.Gender,
+                    Picture = "https://firebasestorage.googleapis.com/v0/b/topibatu-2a076.appspot.com/o/assets%2Fdefault_profile_picture.png?alt=media&token=0135a63e-af90-4c35-8109-d48a9efaf3be"
                 };
 
                 if (request.Password != request.ConfirmPassword)
@@ -160,6 +161,82 @@ namespace TaniLink_Backend.Controllers.GrpcServices
             catch (Exception ex)
             {
                 throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public override async Task<AccountDetail> EditProfile(EditProfileReq request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
+
+                var accountDetail = _mapper.Map(request, user);
+                if (request.DateOfBirth != null && !string.IsNullOrEmpty(request.DateOfBirth.ToString()))
+                    accountDetail.DateOfBirth = DateOnly.Parse(request.DateOfBirth);
+
+                var result = await _userManager.UpdateAsync(accountDetail);
+                if (result.Succeeded)
+                {
+                    var account = _mapper.Map<AccountDetail>(accountDetail);
+                    foreach (var role in await _userManager.GetRolesAsync(accountDetail))
+                    {
+                        account.Role.Add(role);
+                    }
+                    return account;
+                }
+
+                throw new RpcException(new Status(StatusCode.InvalidArgument, result.Errors.FirstOrDefault()?.Description.ToString()!));
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public override async Task<Empty> ChangeEmail(EmailReq request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
+
+                if (user.EmailConfirmed == false)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Please check your inbox or spam email to confirm your email."));
+
+                var result = await _userManager.SetEmailAsync(user, request.Email);
+                if (result.Succeeded)
+                {
+                    var changeUsername = await _userManager.SetUserNameAsync(user, request.Email);
+                    if (!changeUsername.Succeeded)
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, changeUsername.Errors.FirstOrDefault()?.Description.ToString()!));
+
+                    var sendMail = await _sendMailRepository.SendVerificationEmail(request.Email);
+                    if (!sendMail)
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to send verification email"));
+
+                    return new Empty { };
+                }
+
+                throw new RpcException(new Status(StatusCode.InvalidArgument, result.Errors.FirstOrDefault()?.Description.ToString()!));
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+
             }
         }
 
