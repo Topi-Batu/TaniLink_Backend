@@ -32,8 +32,7 @@ namespace TaniLink_Backend.Repository
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                         new Claim(ClaimTypes.NameIdentifier, user.Id),
-                        new Claim(ClaimTypes.Name, user.FullName!),
-                        new Claim(ClaimTypes.Email, user.Email!),
+                        new Claim(ClaimTypes.Name, user.FullName!)
                 }),
                 Expires = tokenExpires,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)

@@ -5,6 +5,7 @@ option csharp_namespace = "TaniLink_Backend";
 package account_proto;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service Accounts {
   rpc Register (RegisterReq) returns (RegisterRes);
@@ -13,7 +14,7 @@ service Accounts {
   rpc IsEmailConfirmed (EmailReq) returns (google.protobuf.Empty);
   rpc ResendVerificationMail(EmailReq) returns (google.protobuf.Empty);
   rpc ForgotPassword(EmailReq) returns (google.protobuf.Empty);
-  rpc ResetPassword(EmailReq) returns (google.protobuf.Empty);
+  rpc ResetPassword(ResetPasswordReq) returns (google.protobuf.Empty);
   rpc ChangePassword(ChangePasswordReq) returns (google.protobuf.Empty);
   rpc Testing (google.protobuf.Empty) returns (Test);
 }
@@ -38,13 +39,18 @@ message AccountDetail{
   string Gender = 6;
   bool EmailConfirmed = 7;
   int64 Xp = 8;
-  repeated string Role = 9;
+  string DateOfBirth = 9;
+  repeated string Role = 10;
 }
 
 message RegisterReq {
   string FullName = 1;
   string Email = 2;
-  string Password = 3;
+  string PhoneNumber = 3;
+  string Gender = 4;
+  string DateOfBirth = 5;
+  string Password = 6;
+  string ConfirmPassword = 7;
 }
 
 message RegisterRes {
@@ -59,7 +65,7 @@ message LoginReq {
 message LoginRes {
 	message Token {
 		string AccessToken = 1;
-		int32 Expires = 2;
+		google.protobuf.Timestamp Expires = 2;
 	}
 	Token Tokens = 1;
 	AccountDetail Account = 2;

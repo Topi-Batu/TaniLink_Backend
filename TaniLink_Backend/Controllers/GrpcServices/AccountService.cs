@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using System.Text;
 using TaniLink_Backend.Interfaces;
 using TaniLink_Backend.Models;
+using static TaniLink_Backend.LoginRes.Types;
 
 namespace TaniLink_Backend.Controllers.GrpcServices
 {
@@ -42,7 +44,13 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                     FullName = request.FullName,
                     UserName = request.Email,
                     Email = request.Email,
+                    PhoneNumber = request.PhoneNumber,
+                    DateOfBirth = DateOnly.Parse(request.DateOfBirth),
+                    Gender = request.Gender,
                 };
+
+                if (request.Password != request.ConfirmPassword)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Password and Confirm Password do not match."));
 
                 var result = await _userManager.CreateAsync(userAdd, request.Password);
                 if (result.Succeeded)
@@ -101,10 +109,10 @@ namespace TaniLink_Backend.Controllers.GrpcServices
 
                 return new LoginRes
                 {
-                    Tokens = new LoginRes.Types.Token
+                    Tokens = new Token
                     {
                         AccessToken = tokenString,
-                        Expires = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds + Convert.ToInt32(_configuration["Jwt:DurationInDay"])
+                        Expires = Timestamp.FromDateTime(DateTime.UtcNow.AddDays(Convert.ToInt32(_configuration["Jwt:DurationInDay"])))
                     },
                     Account = accountDetail
                 };
@@ -133,7 +141,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.Email)!.Value);
+                var user = await _userManager.FindByIdAsync(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
                 if (user == null)
                     throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
 
@@ -155,7 +163,140 @@ namespace TaniLink_Backend.Controllers.GrpcServices
             }
         }
 
+        public override async Task<Empty> IsEmailConfirmed(EmailReq request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(request.Email);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
+
+                if (user.EmailConfirmed == false)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Please check your inbox or spam email to confirm your email."));
+
+                return new Empty { };
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        public override async Task<Empty> ResendVerificationMail(EmailReq request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(request.Email);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
+
+                if(user.EmailConfirmed == true)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Email already confirmed"));
+
+                var sendMail = await _sendMailRepository.SendVerificationEmail(request.Email);
+                if (!sendMail)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to send verification email"));
+
+                return new Empty { };
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        public override async Task<Empty> ForgotPassword(EmailReq request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(request.Email);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
+
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                if (token == null)
+                    throw new RpcException(new Status(StatusCode.Internal, "Failed to generate reset password token"));
+
+                token = Convert.ToBase64String(Encoding.UTF8.GetBytes(token));
+                var sendResetMail = await _sendMailRepository.SendResetPasswordEmail(request.Email, token);
+                if (!sendResetMail)
+                    throw new RpcException(new Status(StatusCode.Internal, "Failed to send reset password email"));
+
+                return new Empty { };
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
 
 
+        public override async Task<Empty> ResetPassword(ResetPasswordReq request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(request.Id);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
+
+                if (request.NewPassword != request.ConfirmNewPassword)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Password and Confirm Password do not match."));
+
+                var token = Encoding.UTF8.GetString(Convert.FromBase64String(request.Token));
+                var result = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
+                if (!result.Succeeded)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, result.Errors.FirstOrDefault()?.Description.ToString()!));
+
+                return new Empty { };
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public override async Task<Empty> ChangePassword(ChangePasswordReq request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
+
+                if (request.NewPassword != request.ConfirmNewPassword)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Password and Confirm Password do not match."));
+
+                var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
+                if (!result.Succeeded)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, result.Errors.FirstOrDefault()?.Description.ToString()!));
+
+                return new Empty { };
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
     }
 }

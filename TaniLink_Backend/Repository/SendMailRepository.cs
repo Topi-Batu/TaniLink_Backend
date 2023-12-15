@@ -45,7 +45,7 @@ namespace TaniLink_Backend.Repository
                 { "template_variables",
                     new {
                         user_email = user.Email,
-                        pass_reset_link = "https://tanilink.bantuin.me/user/reset-password?token=" + token + "&id=" + user.Id
+                        pass_reset_link = "https://tanilink.bantuin.me/User/ResetPassword?token=" + token + "&id=" + user.Id
                     }
                 },
             };
@@ -99,7 +99,7 @@ namespace TaniLink_Backend.Repository
                 { "template_variables",
                     new {
                         name = user.FullName,
-                        verify_link = "https://tanilink.bantuin.me/user/verify?token=" + token + "&id=" + user.Id
+                        verify_link = "https://tanilink.bantuin.me/User/Verify?token=" + token + "&id=" + user.Id
                     }
                 },
             };
