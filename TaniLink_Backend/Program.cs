@@ -16,6 +16,7 @@ builder.Services.AddLogging();
 builder.Services.AddControllersWithViews();
 builder.Services.AddGrpc();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ISendMailRepository, SendMailRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<Seed>();
@@ -107,6 +108,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.MapGrpcService<AccountService>();
+app.MapGrpcService<MarketplaceService>();
 
 app.UseAuthorization();
 

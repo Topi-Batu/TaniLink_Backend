@@ -5,19 +5,20 @@ option csharp_namespace = "TaniLink_Backend";
 package marketplace_proto;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service Marketplace {
-  rpc GetAllProduct (google.protobuf.Empty) returns (ProductDetail);
+  rpc GetAllProducts (google.protobuf.Empty) returns (AllProductDetails);
   rpc GetProductById (IdReq) returns (ProductDetail);
-  rpc GetProductByCommodityId (IdReq) returns (ProductDetail);
-  rpc GetProductByAreaId (IdReq) returns (ProductDetail);
-  rpc GetProductBySellerId (IdReq) returns (ProductDetail);
-  rpc GetProductByPriceRange (PriceRange) returns (ProductDetail);
-  rpc SearchProduct(Query) returns (ProductDetail);
-  rpc GetUserShoppingCarts (google.protobuf.Empty) returns (ShoppingCartDetail);
+  rpc GetProductByCommodityId (IdReq) returns (AllProductDetails);
+  rpc GetProductByAreaId (IdReq) returns (AllProductDetails);
+  rpc GetProductBySellerId (IdReq) returns (AllProductDetails);
+  rpc GetProductByPriceRange (PriceRange) returns (AllProductDetails);
+  rpc SearchProduct(Query) returns (AllProductDetails);
+  rpc GetUserShoppingCarts (google.protobuf.Empty) returns (AllShoppingCartDetail);
   rpc GetUserOrders (google.protobuf.Empty) returns (OrderDetail);
   rpc AddProductToShoppingCart (IdReq) returns (ShoppingCartDetail);
-  rpc RemoveProductFromShoppingCart (IdReq) returns (ShoppingCartDetail);
+  rpc RemoveProductFromShoppingCart (IdReq) returns (AllShoppingCartDetail);
   rpc Checkout (google.protobuf.Empty) returns (OrderDetail);
   rpc CancelOrder (IdReq) returns (OrderDetail);
   rpc ConfirmOrder (IdReq) returns (OrderDetail);
@@ -43,16 +44,24 @@ message IdReq {
 	string Id = 1;
 }
 
+message AllProductDetails {
+	repeated ProductDetail Products = 1;
+}
+
 message ProductDetail {
 	string Id = 1;
 	string Name = 2;
-	string Price = 3;
-	int32 AvailableStock = 4;
-	int32 Sold = 5;
-	string CommodityId = 6;
-	string AreaId = 7;
-	string SellerId = 8;
-	repeated string Image = 9;
+	string Description = 3;
+	string Price = 4;
+	int32 AvailableStock = 5;
+	int32 Sold = 6;
+	string CommodityId = 7;
+	string AreaId = 8;
+	string SellerId = 9;
+	repeated string Image = 10;
+	google.protobuf.Timestamp CreatedAt = 11;
+	google.protobuf.Timestamp UpdatedAt = 12;
+	google.protobuf.Timestamp DeletedAt = 13;
 }
 
 message PriceRange {
@@ -61,6 +70,10 @@ message PriceRange {
 }
 message Query {
 	string Query = 1;
+}
+
+message AllShoppingCartDetail {
+	repeated ShoppingCartDetail ShoppingCarts = 1;
 }
 
 message ShoppingCartDetail {
