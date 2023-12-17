@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TaniLink_Backend.Models;
 
 namespace TaniLink_Backend.Data
@@ -25,10 +26,23 @@ namespace TaniLink_Backend.Data
         public DbSet<MessageImage> MessageImages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Soft Delete
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(Auditable).IsAssignableFrom(entityType.ClrType))
+                {
+                    modelBuilder.Entity(entityType.ClrType)
+                        .HasQueryFilter(BuildSoftDeleteFilter(entityType.ClrType));
+                }
+            }
+
+            // Cascade Delete
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.Cascade;
             }
+
+            // Many to Many Conversation
             modelBuilder.Entity<ShoppingCart>()
                 .HasOne(sc => sc.Product)
                 .WithMany(p => p.ShoppingCarts)
@@ -37,13 +51,28 @@ namespace TaniLink_Backend.Data
                 .HasOne(sc => sc.User)
                 .WithMany(u => u.ShoppingCarts)
                 .OnDelete(DeleteBehavior.Restrict);
-            /*modelBuilder.Entity<Order>()
-                .HasMany(o => o.ShoppingCart)
-                .WithMany(p => p.Orders)
-                .UsingEntity(j => j.ToTable("OrderShoppingCart"));*/
             base.OnModelCreating(modelBuilder);
         }
 
+        // Soft Delete
+        private LambdaExpression BuildSoftDeleteFilter(Type entityType)
+        {
+            var parameter = Expression.Parameter(entityType, "x");
+            var property = Expression.Property(parameter, "DeletedAt");
+            var nullValue = Expression.Constant(null, typeof(DateTimeOffset?));
+            var condition = Expression.Equal(property, nullValue);
+
+            return Expression.Lambda(condition, parameter);
+        }
+
+        // Fuzzy Search
+        [DbFunction(name:"SOUNDEX", IsBuiltIn = true)]
+        public string FuzzySearch(string search)
+        {
+            throw new NotImplementedException();
+        }
+
+        // Auditable
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var insertedEntries = this.ChangeTracker.Entries()
