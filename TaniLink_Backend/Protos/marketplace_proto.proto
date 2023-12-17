@@ -16,10 +16,12 @@ service Marketplace {
   rpc GetProductByPriceRange (PriceRange) returns (AllProductDetails);
   rpc SearchProduct(Query) returns (AllProductDetails);
   rpc GetUserShoppingCarts (google.protobuf.Empty) returns (AllShoppingCartDetail);
-  rpc GetUserOrders (google.protobuf.Empty) returns (OrderDetail);
-  rpc AddProductToShoppingCart (IdReq) returns (ShoppingCartDetail);
+  rpc GetUserOrders (google.protobuf.Empty) returns (AllOrderDetail);
+  rpc AddProductToShoppingCart (IdReq) returns (AllShoppingCartDetail);
+  rpc DecreaseProductInShoppingCart (IdReq) returns (AllShoppingCartDetail);
   rpc RemoveProductFromShoppingCart (IdReq) returns (AllShoppingCartDetail);
-  rpc Checkout (google.protobuf.Empty) returns (OrderDetail);
+  rpc Checkout (CheckoutReq) returns (OrderDetail);
+  rpc PlaceOrder (PlaceOrderReq) returns (OrderDetail);
   rpc CancelOrder (IdReq) returns (OrderDetail);
   rpc ConfirmOrder (IdReq) returns (OrderDetail);
   rpc GetOrderById (IdReq) returns (OrderDetail);
@@ -38,6 +40,18 @@ enum OrderStatus{
 	DELIVERED = 3;
 	FINISHED = 4;
 	CANCELLED = 5;
+	CHECKOUT = 6;
+	NEEDPAYMENT = 7;
+}
+
+message PlaceOrderReq {
+	string OrderId = 1;
+	string AddressId = 2;
+	string Notes = 3;
+}
+
+message CheckoutReq {
+	repeated string ShoppingCartId = 1;
 }
 
 message IdReq {
@@ -65,8 +79,8 @@ message ProductDetail {
 }
 
 message PriceRange {
-	string Lower = 1;
-	string Upper = 2;
+	string minValue = 1;
+	string maxValue = 2;
 }
 message Query {
 	string Query = 1;
@@ -81,14 +95,25 @@ message ShoppingCartDetail {
 	int32 Amount = 2;
 	int64 FinalPrice = 3;
 	ProductDetail Product = 4;
+	google.protobuf.Timestamp CreatedAt = 5;
+	google.protobuf.Timestamp UpdatedAt = 6;
+	google.protobuf.Timestamp DeletedAt = 7;
+}
+
+message AllOrderDetail {
+	repeated OrderDetail Orders = 1;
 }
 
 message OrderDetail {
 	string Id = 1;
 	string Notes = 2;
 	int64 TotalPrice = 3;
-	OrderStatus Status = 5;
-	repeated ShoppingCartDetail ShoppingCarts = 6;
+	string Address = 4;
+	OrderStatus Status = 6;
+	repeated ShoppingCartDetail ShoppingCarts = 7;
+	google.protobuf.Timestamp CreatedAt = 8;
+	google.protobuf.Timestamp UpdatedAt = 9;
+	google.protobuf.Timestamp DeletedAt = 10;
 }
 
 

@@ -17,6 +17,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddGrpc();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ISendMailRepository, SendMailRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<Seed>();

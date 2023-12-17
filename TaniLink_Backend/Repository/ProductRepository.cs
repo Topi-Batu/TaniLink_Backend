@@ -37,6 +37,7 @@ namespace TaniLink_Backend.Repository
                 _context.Products.Remove(product);
             }
 
+            await _context.SaveChangesAsync();
             return product;
         }
 
@@ -58,9 +59,22 @@ namespace TaniLink_Backend.Repository
                 .Include(p => p.Area)
                 .Include(p => p.Commodity)
                 .Include(p => p.Seller)
+                    .ThenInclude(s => s.User)
                 .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == productId);
             return product;
+        }
+
+        public async Task<IEnumerable<Product>> GetProductByPriceRange(decimal minValue, decimal maxValue)
+        {
+            var products = await _context.Products
+                .Where(p => p.Price >= minValue && p.Price <= maxValue)
+                .Include(p => p.Area)
+                .Include(p => p.Commodity)
+                .Include(p => p.Seller)
+                .Include(p => p.Images)
+                .ToListAsync();
+            return products;
         }
 
         public async Task<IEnumerable<Product>> GetProductsByAreaId(string areaId)
@@ -85,6 +99,19 @@ namespace TaniLink_Backend.Repository
                 .Include(p => p.Images)
                 .ToListAsync();
             return product;
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsBySearch(string search)
+        {
+            var products = await _context.Products
+                .Where(p => _context.FuzzySearch(p.Name) == _context.FuzzySearch(search) || _context.FuzzySearch(p.Description) == _context.FuzzySearch(search) || _context.FuzzySearch(p.Commodity.Name) == _context.FuzzySearch(search) || _context.FuzzySearch(p.Seller.User.FullName) == _context.FuzzySearch(search))
+                .Include(p => p.Area)
+                .Include(p => p.Commodity)
+                .Include(p => p.Seller)
+                    .ThenInclude(s => s.User)
+                .Include(p => p.Images)
+                .ToListAsync();
+            return products;
         }
 
         public async Task<IEnumerable<Product>> GetProductsBySellerId(string sellerId)

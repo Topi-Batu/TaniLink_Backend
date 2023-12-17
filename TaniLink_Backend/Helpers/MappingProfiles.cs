@@ -15,6 +15,7 @@ namespace TaniLink_Backend.Helpers
             CreateMap<EditProfileReq, User>()
                 .ForMember(dest => dest.DateOfBirth, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null && !string.IsNullOrEmpty(srcMember.ToString())));
+            
             CreateMap<Product, ProductDetail>()
                 .ForMember(dest => dest.CommodityId, opt => opt.MapFrom(src => src.Commodity.Id))
                 .ForMember(dest => dest.AreaId, opt => opt.MapFrom(src => src.Area.Id))
@@ -24,6 +25,33 @@ namespace TaniLink_Backend.Helpers
                 .ForMember(dest => dest.UpdatedAt, opt => {
                     opt.PreCondition(src => src.UpdatedAt != null);
                     opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.UpdatedAt.Value)); 
+                })
+                .ForMember(dest => dest.DeletedAt, opt => {
+                    opt.PreCondition(src => src.DeletedAt != null);
+                    opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.DeletedAt.Value));
+                })
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null && !string.IsNullOrEmpty(srcMember.ToString())));
+            
+            CreateMap<ShoppingCart, ShoppingCartDetail>()
+                .ForPath(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
+                .ForMember(dest => dest.FinalPrice, opt => opt.MapFrom(src => src.Product.Price * src.Amount))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.CreatedAt)))
+                .ForMember(dest => dest.UpdatedAt, opt => {
+                    opt.PreCondition(src => src.UpdatedAt != null);
+                    opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.UpdatedAt.Value));
+                })
+                .ForMember(dest => dest.DeletedAt, opt => {
+                    opt.PreCondition(src => src.DeletedAt != null);
+                    opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.DeletedAt.Value));
+                })
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null && !string.IsNullOrEmpty(srcMember.ToString())));
+            CreateMap<Order, OrderDetail>()
+                .ForPath(dest => dest.ShoppingCarts, opt => opt.MapFrom(src => src.ShoppingCart))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address.Detail))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.CreatedAt)))
+                .ForMember(dest => dest.UpdatedAt, opt => {
+                    opt.PreCondition(src => src.UpdatedAt != null);
+                    opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.UpdatedAt.Value));
                 })
                 .ForMember(dest => dest.DeletedAt, opt => {
                     opt.PreCondition(src => src.DeletedAt != null);
