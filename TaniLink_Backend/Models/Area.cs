@@ -13,6 +13,6 @@ namespace TaniLink_Backend.Models
         public ICollection<Commodity>? Commodities { get; set; }
         public ICollection<Address>? Addresses { get; set; }
         public ICollection<Product>? Products { get; set; }
-
+        public ICollection<Prediction>? Predictions { get; set; }
     }
 }
