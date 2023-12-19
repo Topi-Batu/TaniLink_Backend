@@ -44,6 +44,7 @@ namespace TaniLink_Backend.Repository
         {
             var address = await _context.Addresses
                 .Include(a => a.User)
+                .Include(a => a.Area)
                 .FirstOrDefaultAsync(a => a.Id == addressId);
             return address;
         }
@@ -52,6 +53,17 @@ namespace TaniLink_Backend.Repository
         {
             var addresses = await _context.Addresses
                 .Include(a => a.User)
+                .Include(a => a.Area)
+                .ToListAsync();
+            return addresses;
+        }
+
+        public async Task<IEnumerable<Address>> GetAllAddressesByUser(string userId)
+        {
+            var addresses = await _context.Addresses
+                .Where(a => a.User.Id == userId)
+                .Include(a => a.User)
+                .Include(a => a.Area)
                 .ToListAsync();
             return addresses;
         }
