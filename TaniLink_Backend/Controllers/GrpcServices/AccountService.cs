@@ -16,22 +16,25 @@ namespace TaniLink_Backend.Controllers.GrpcServices
     {
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly IAddressRepository _addressRepository;
+        private readonly IAreaRepository _areaRepository;
         private readonly ITokenRepository _tokenRepository;
         private readonly ISendMailRepository _sendMailRepository;
 
         public AccountService(IMapper mapper,
             UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager,
             IConfiguration configuration,
+            IAddressRepository addressRepository,
+            IAreaRepository areaRepository,
             ITokenRepository tokenRepository,
             ISendMailRepository sendMailRepository)
         {
             _mapper = mapper;
             _userManager = userManager;
-            _roleManager = roleManager;
             _configuration = configuration;
+            _addressRepository = addressRepository;
+            _areaRepository = areaRepository;
             _tokenRepository = tokenRepository;
             _sendMailRepository = sendMailRepository;
         }
@@ -128,13 +131,25 @@ namespace TaniLink_Backend.Controllers.GrpcServices
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "User, Admin")]
-        public override async Task<Test> Testing(Empty request, ServerCallContext context)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public override async Task<AllAreaDetails> GetAllArea(Empty request, ServerCallContext context)
         {
-            return new Test
+            try
             {
-                Test_ = "Hello World"
-            };
+                var areas = await _areaRepository.GetAllAreas();
+                var areaMap = _mapper.Map<IEnumerable<AreaDetail>>(areas);
+                var allAreas = new AllAreaDetails();
+                allAreas.Area.AddRange(areaMap);
+                return allAreas;
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -198,6 +213,144 @@ namespace TaniLink_Backend.Controllers.GrpcServices
             {
                 throw new RpcException(new Status(StatusCode.Internal, ex.Message));
 
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public override async Task<AllAddressDetails> GetAddress(Empty request, ServerCallContext context)
+        {
+            try
+            {
+                var addresses = await _addressRepository.GetAllAddressesByUser(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+                var addressMap = _mapper.Map<IEnumerable<AddressDetail>>(addresses);
+                var addressDetails = new AllAddressDetails();
+                addressDetails.Address.AddRange(addressMap);
+                return addressDetails;
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public override async Task<AllAddressDetails> AddAddress(BatchAddAddressReq request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
+
+                foreach (var address in request.Address)
+                {
+                    var area = await _areaRepository.GetAreaById(address.AreaId);
+                    if (area == null)
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Area not found"));
+
+                    var addressAdd = new Address
+                    {
+                        Detail = address.Detail,
+                        Area = area,
+                        User = user
+                    };
+
+                    var createAddress = await _addressRepository.CreateAddress(addressAdd);
+                    if (createAddress == null)
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to create address"));
+                }
+
+                return await GetAddress(new Empty(), context);
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public override async Task<AllAddressDetails> EditAddress(BatchEditAddressReq request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+                if (user == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "User not found"));
+
+                foreach (var address in request.Address)
+                {
+                    var area = await _areaRepository.GetAreaById(address.AreaId);
+                    if (area == null)
+                        throw new RpcException(new Status(StatusCode.InvalidArgument, "Area not found"));
+
+                    var addressEdit = await _addressRepository.GetAddressById(address.Id);
+                    if (addressEdit == null)
+                    {
+                        var addressAdd = new Address
+                        {
+                            Detail = address.Detail,
+                            Area = area,
+                            User = user
+                        };
+
+                        var createAddress = await _addressRepository.CreateAddress(addressAdd);
+                        if (createAddress == null)
+                            throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to create address"));
+                    } 
+                    else
+                    {
+                        addressEdit.Detail = address.Detail;
+                        addressEdit.Area = area;
+
+                        var updateAddress = await _addressRepository.UpdateAddress(addressEdit);
+                        if (updateAddress == null)
+                            throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to update address"));
+                    }
+
+                }
+
+                return await GetAddress(new Empty(), context);
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public override async Task<AllAddressDetails> DeleteAddress(AddressIdReq request, ServerCallContext context)
+        {
+            try
+            {
+                var address = await _addressRepository.GetAddressById(request.AddressId);
+                if (address == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Address not found"));
+
+                var deleteAddress = await _addressRepository.DeleteAddress(request.AddressId);
+                if (deleteAddress == null)
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to delete address"));
+
+                return await GetAddress(new Empty(), context);
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
             }
         }
 

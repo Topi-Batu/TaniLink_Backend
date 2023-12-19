@@ -10,15 +10,25 @@ import "google/protobuf/timestamp.proto";
 service Accounts {
   rpc Register (RegisterReq) returns (RegisterRes);
   rpc Login (LoginReq) returns (LoginRes);
-  rpc GetProfile (google.protobuf.Empty) returns (AccountDetail);
-  rpc EditProfile (EditProfileReq) returns (AccountDetail);
-  rpc ChangeEmail (EmailReq) returns (google.protobuf.Empty);
   rpc IsEmailConfirmed (EmailReq) returns (google.protobuf.Empty);
   rpc ResendVerificationMail(EmailReq) returns (google.protobuf.Empty);
   rpc ForgotPassword(EmailReq) returns (google.protobuf.Empty);
   rpc ResetPassword(ResetPasswordReq) returns (google.protobuf.Empty);
+
+  // Need Authorized User
+  rpc GetAllArea (google.protobuf.Empty) returns (AllAreaDetails);
+  rpc GetProfile (google.protobuf.Empty) returns (AccountDetail);
+  rpc EditProfile (EditProfileReq) returns (AccountDetail);
+  rpc GetAddress (google.protobuf.Empty) returns (AllAddressDetails);
+  rpc AddAddress (BatchAddAddressReq) returns (AllAddressDetails);
+  rpc EditAddress (BatchEditAddressReq) returns (AllAddressDetails);
+  rpc DeleteAddress (AddressIdReq) returns (AllAddressDetails);
+  rpc ChangeEmail (EmailReq) returns (google.protobuf.Empty);
   rpc ChangePassword(ChangePasswordReq) returns (google.protobuf.Empty);
-  rpc Testing (google.protobuf.Empty) returns (Test);
+}
+
+message AddressIdReq {
+	string AddressId = 1;
 }
 
 enum Role {
@@ -43,6 +53,48 @@ message AccountDetail {
   int64 Xp = 8;
   string DateOfBirth = 9;
   repeated string Role = 10;
+  repeated AddressDetail Address = 11;
+}
+
+message AllAreaDetails {
+	repeated AreaDetail Area = 1;
+}
+
+message AreaDetail {
+	string Id = 1;
+	string Kecamatan = 2;
+	string Kota = 3;
+	string Provinsi = 4;
+}
+
+message AllAddressDetails {
+	repeated AddressDetail Address = 1;
+}
+
+message AddressDetail {
+	string Id = 1;
+	string Detail = 2;
+	AreaDetail Area = 3;
+	google.protobuf.Timestamp CreatedAt = 4;
+	google.protobuf.Timestamp UpdatedAt = 5;
+	google.protobuf.Timestamp DeletedAt = 6;
+}
+
+message BatchAddAddressReq {
+	message AddAddressReq{
+  		string Detail = 1;
+		string AreaId = 2;
+	}
+	repeated AddAddressReq Address = 1;
+}
+
+message BatchEditAddressReq {
+	message EditAddressReq{
+		string Id = 1;
+  		string Detail = 2;
+		string AreaId = 3;
+	}
+	repeated EditAddressReq Address = 1;
 }
 
 message EditProfileReq {
@@ -92,9 +144,5 @@ message ChangePasswordReq{
 	string OldPassword = 1;
 	string NewPassword = 2;
 	string ConfirmNewPassword = 3;
-}
-
-message Test{
-  string Test = 1;
 }
 
