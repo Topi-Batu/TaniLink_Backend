@@ -45,9 +45,24 @@ namespace TaniLink_Backend.Helpers
                     opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.DeletedAt.Value));
                 })
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null && !string.IsNullOrEmpty(srcMember.ToString())));
+            
             CreateMap<Order, OrderDetail>()
                 .ForPath(dest => dest.ShoppingCarts, opt => opt.MapFrom(src => src.ShoppingCart))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address.Detail))
+                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.ShoppingCart.Sum(sc => sc.Amount * sc.Product.Price) + src.DeliveryPrice))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.CreatedAt)))
+                .ForMember(dest => dest.UpdatedAt, opt => {
+                    opt.PreCondition(src => src.UpdatedAt != null);
+                    opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.UpdatedAt.Value));
+                })
+                .ForMember(dest => dest.DeletedAt, opt => {
+                    opt.PreCondition(src => src.DeletedAt != null);
+                    opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.DeletedAt.Value));
+                })
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null && !string.IsNullOrEmpty(srcMember.ToString())));
+            
+            CreateMap<Invoice, InvoiceDetail>()
+                .ForPath(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.CreatedAt)))
                 .ForMember(dest => dest.UpdatedAt, opt => {
                     opt.PreCondition(src => src.UpdatedAt != null);

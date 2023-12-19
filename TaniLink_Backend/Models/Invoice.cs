@@ -6,7 +6,7 @@ namespace TaniLink_Backend.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? Id { get; set; }
-        public string XenditInvoiceId { get; set; }
+        public string? PaymentEvidence { get; set; }
         public long TotalPrice { get; set; }
         public InvoiceStatus Status { get; set; }
         public ICollection<Order>? Orders { get; set; }

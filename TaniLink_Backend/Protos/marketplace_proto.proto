@@ -15,16 +15,21 @@ service Marketplace {
   rpc GetProductBySellerId (IdReq) returns (AllProductDetails);
   rpc GetProductByPriceRange (PriceRange) returns (AllProductDetails);
   rpc SearchProduct(Query) returns (AllProductDetails);
+
+  // Need Authorized User
   rpc GetUserShoppingCarts (google.protobuf.Empty) returns (AllShoppingCartDetail);
+  rpc GetShoppingCartById (IdReq) returns (ShoppingCartDetail);
   rpc GetUserOrders (google.protobuf.Empty) returns (AllOrderDetail);
+  rpc GetOrderById (IdReq) returns (OrderDetail);
+  rpc GetUserInvoices (google.protobuf.Empty) returns (AllInvoiceDetail);
+  rpc GetInvoiceById (IdReq) returns (InvoiceDetail);
   rpc AddProductToShoppingCart (IdReq) returns (AllShoppingCartDetail);
   rpc DecreaseProductInShoppingCart (IdReq) returns (AllShoppingCartDetail);
   rpc RemoveProductFromShoppingCart (IdReq) returns (AllShoppingCartDetail);
-  rpc Checkout (CheckoutReq) returns (OrderDetail);
-  rpc PlaceOrder (PlaceOrderReq) returns (OrderDetail);
+  rpc Checkout (CheckoutReq) returns (InvoiceDetail);
+  rpc PlaceOrder (PlaceOrderReq) returns (InvoiceDetail);
   rpc CancelOrder (IdReq) returns (OrderDetail);
   rpc ConfirmOrder (IdReq) returns (OrderDetail);
-  rpc GetOrderById (IdReq) returns (OrderDetail);
 
 }
 
@@ -45,9 +50,13 @@ enum OrderStatus{
 }
 
 message PlaceOrderReq {
-	string OrderId = 1;
+	string InvoiceId = 1;
 	string AddressId = 2;
-	string Notes = 3;
+	message Notes {
+		string OrderId = 1;
+		string Note = 2;
+	}
+	repeated Notes OrderNotes = 3;
 }
 
 message CheckoutReq {
@@ -107,13 +116,28 @@ message AllOrderDetail {
 message OrderDetail {
 	string Id = 1;
 	string Notes = 2;
-	int64 TotalPrice = 3;
-	string Address = 4;
+	int64 DeliveryPrice = 3;
+	int64 TotalPrice = 4;
+	string Address = 5;
 	OrderStatus Status = 6;
 	repeated ShoppingCartDetail ShoppingCarts = 7;
 	google.protobuf.Timestamp CreatedAt = 8;
 	google.protobuf.Timestamp UpdatedAt = 9;
 	google.protobuf.Timestamp DeletedAt = 10;
+}
+
+message AllInvoiceDetail {
+	repeated InvoiceDetail Invoices = 1;
+}
+
+message InvoiceDetail {
+	string Id = 1;
+	int64 TotalPrice = 2;
+	InvoiceStatus Status = 3;
+	repeated OrderDetail Orders = 4;
+	google.protobuf.Timestamp CreatedAt = 5;
+	google.protobuf.Timestamp UpdatedAt = 6;
+	google.protobuf.Timestamp DeletedAt = 7;
 }
 
 

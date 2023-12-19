@@ -25,7 +25,7 @@ namespace TaniLink_Backend.Repository
             var shoppingCart = await _context.ShoppingCarts
                 .FirstOrDefaultAsync(sc => sc.Id == shoppingCartId);
 
-            if (typeof(Auditable).IsAssignableFrom(typeof(Product)))
+            if (typeof(Auditable).IsAssignableFrom(typeof(ShoppingCart)))
             {
                 (shoppingCart as Auditable).DeletedAt = DateTimeOffset.UtcNow;
                 _context.ShoppingCarts.Attach(shoppingCart);
@@ -71,6 +71,7 @@ namespace TaniLink_Backend.Repository
             var shoppingCart = await _context.ShoppingCarts
                 .Where(sc => sc.Id == shoppingCartId)
                 .Include(sc => sc.Product)
+                    .ThenInclude(p => p.Seller)
                 .FirstOrDefaultAsync();
             return shoppingCart;
         }

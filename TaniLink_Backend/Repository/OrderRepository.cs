@@ -25,7 +25,7 @@ namespace TaniLink_Backend.Repository
             var order = await _context.Orders
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            if (typeof(Auditable).IsAssignableFrom(typeof(Product)))
+            if (typeof(Auditable).IsAssignableFrom(typeof(Order)))
             {
                 (order as Auditable).DeletedAt = DateTimeOffset.UtcNow;
                 _context.Orders.Attach(order);
@@ -53,9 +53,21 @@ namespace TaniLink_Backend.Repository
         public async Task<Order> GetOrderById(string orderId)
         {
             var order = await _context.Orders
+                .Where(o => o.Id == orderId)
                 .Include(o => o.Address)
                 .Include(o => o.Invoices)
                 .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Area)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Commodity)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Seller)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Images)
                 .FirstOrDefaultAsync();
             return order;
         }
@@ -65,10 +77,20 @@ namespace TaniLink_Backend.Repository
             var orders = await _context.Orders
                 .Where(o => o.Address.User.Id == buyerId)
                 .Include(o => o.Address)
-                    .ThenInclude(sc => sc.User)
+                    .ThenInclude(a => a.User)
                 .Include(o => o.Invoices)
                 .Include(o => o.ShoppingCart)
                     .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Area)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Commodity)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Seller)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Images)
                 .ToListAsync();
             return orders;
         }
@@ -81,6 +103,16 @@ namespace TaniLink_Backend.Repository
                 .Include(o => o.Invoices)
                 .Include(o => o.ShoppingCart)
                     .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Area)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Commodity)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Seller)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Images)
                 .ToListAsync();
             return orders;
         }
@@ -91,6 +123,18 @@ namespace TaniLink_Backend.Repository
                 .Where(o => o.ShoppingCart.Any(sc => sc.Product.Seller.User.Id == sellerId ))
                 .Include(o => o.Address)
                 .Include(o => o.Invoices)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Area)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Commodity)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Seller)
+                .Include(o => o.ShoppingCart)
+                    .ThenInclude(sc => sc.Product)
+                        .ThenInclude(p => p.Images)
                 .Include(o => o.ShoppingCart)
                     .ThenInclude(sc => sc.Product)
                         .ThenInclude(p => p.Seller)
