@@ -14,6 +14,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
     {
         private readonly IMapper _mapper;
         private readonly IAddressRepository _addressRepository;
+        private readonly ICommodityRepository _commodityRepository;
         private readonly IProductRepository _productRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IShoppingCartRepository _shoppingCartRepository;
@@ -22,6 +23,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
 
         public MarketplaceService(IMapper mapper,
             IAddressRepository addressRepository,
+            ICommodityRepository commodityRepository,
             IProductRepository productRepository,
             IOrderRepository orderRepository,
             IShoppingCartRepository shoppingCartRepository,
@@ -30,6 +32,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
         {
             _mapper = mapper;
             _addressRepository = addressRepository;
+            _commodityRepository = commodityRepository;
             _productRepository = productRepository;
             _orderRepository = orderRepository;
             _shoppingCartRepository = shoppingCartRepository;
@@ -161,6 +164,45 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                 var response = new AllProductDetails();
                 response.Products.AddRange(productsResponse);
                 return response;
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        public override async Task<AllCommodityDetails> GetAllCommodities(Empty request, ServerCallContext context)
+        {
+
+            try
+            {
+                var commodities = await _commodityRepository.GetAllCommodities();
+                var commoditiesResponse = _mapper.Map<IEnumerable<CommodityDetail>>(commodities);
+                var response = new AllCommodityDetails();
+                response.Commodities.AddRange(commoditiesResponse);
+                return response;
+            }
+            catch (RpcException ex)
+            {
+                throw new RpcException(ex.Status);
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        public override async Task<CommodityDetail> GetCommodityById(IdReq request, ServerCallContext context)
+        {
+            try
+            {
+                var commodity = await _commodityRepository.GetCommodityById(request.Id);
+                var commodityResponse = _mapper.Map<CommodityDetail>(commodity);
+                return commodityResponse;
             }
             catch (RpcException ex)
             {
