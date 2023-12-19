@@ -7,9 +7,10 @@ namespace TaniLink_Backend.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? Id { get; set; }
         public string? Name { get; set; }
+        public string? Image { get; set; }
         public string? Description { get; set; }
         public ICollection<Area>? Areas { get; set; }
         public ICollection<Product>? Products { get; set; }
-
+        public ICollection<Prediction>? Predictions { get; set; }
     }
 }

@@ -76,10 +76,11 @@ message AllCommodityDetails {
 message CommodityDetail {
 	string Id = 1;
 	string Name = 2;
-	string Description = 3;
-	google.protobuf.Timestamp CreatedAt = 4;
-	google.protobuf.Timestamp UpdatedAt = 5;
-	google.protobuf.Timestamp DeletedAt = 6;
+	string Image = 3;
+	string Description = 4;
+	google.protobuf.Timestamp CreatedAt = 5;
+	google.protobuf.Timestamp UpdatedAt = 6;
+	google.protobuf.Timestamp DeletedAt = 7;
 }
 
 message AllProductDetails {
