@@ -68,7 +68,7 @@ namespace TaniLink_Backend.Repository
         public async Task<IEnumerable<Invoice>> GetAllInvoicesByUser(string userId)
         {
             var invoices = await _context.Invoices
-                .Where(i => i.Orders.Select(o => o.Address.User.Id).FirstOrDefault() == userId)
+                .Where(i => i.Orders.Select(o => o.ShoppingCart.Select(sc => sc.User.Id).FirstOrDefault()).FirstOrDefault() == userId)
                 .Include(i => i.Orders)
                     .ThenInclude(o => o.ShoppingCart)
                         .ThenInclude(sc => sc.Product)
