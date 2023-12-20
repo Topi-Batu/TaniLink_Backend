@@ -6,13 +6,23 @@ WORKDIR /app
 
 # Install Git to clone the repository
 RUN apt-get update \
-    && apt-get install -y git
+    && apt-get install -y git \
+    && apt-get install -y curl
 
 # Install ODBC drivers for SQL Server
 RUN apt-get install -y --no-install-recommends \
     unixodbc \
     unixodbc-dev \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+RUN ACCEPT_EULA=Y apt-get install -y mssql-tools18 \
+    && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
+    && source ~/.bashrc
 
 # Clone the GitHub repository into the container
 RUN git clone https://github.com/Topi-Batu/ml-deployment /app
