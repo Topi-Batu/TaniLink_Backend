@@ -18,7 +18,7 @@ RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor
 
 RUN ACCEPT_EULA=Y apt-get install -y mssql-tools18 \
     && echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc \
-    && source ~/.bashrc
+    && . ~/.bashrc
 
 RUN apt-get install -y --no-install-recommends \
     unixodbc \
