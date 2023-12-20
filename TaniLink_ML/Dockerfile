@@ -6,12 +6,12 @@ WORKDIR /app
 
 # Install Git to clone the repository
 RUN apt-get update \
-    && apt-get install -y git \
-    && apt-get install -y curl
+    && apt-get install -y curl gnupg \
+    && apt-get install -y git
 
 # Install ODBC drivers for SQL Server
 
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+RUN RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg \
     && curl https://packages.microsoft.com/config/debian/12/prod.list > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
     && ACCEPT_EULA=Y apt-get install -y msodbcsql18
