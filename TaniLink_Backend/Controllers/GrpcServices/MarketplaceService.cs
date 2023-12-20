@@ -352,7 +352,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                     throw new RpcException(new Status(StatusCode.NotFound, "You can't buy your own product"));
 
                 var shoppingCart = await _shoppingCartRepository.GetAllShoppingCartsByUser(context.GetHttpContext().User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
-                var shoppingCartExist = shoppingCart.FirstOrDefault(sc => sc.Product.Id == product.Id);
+                var shoppingCartExist = shoppingCart.FirstOrDefault(sc => sc.Product.Id == product.Id && !sc.Orders.Any());
                 if (shoppingCartExist != null)
                 {
                     shoppingCartExist.Amount += 1;
