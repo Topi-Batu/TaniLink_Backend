@@ -12,7 +12,10 @@ using TaniLink_Backend.Repository;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddLogging();
+builder.Services.AddLogging(builder =>
+{
+    builder.AddConsole();
+});
 builder.Services.AddControllersWithViews();
 builder.Services.AddGrpc();
 builder.Services.AddSignalR();

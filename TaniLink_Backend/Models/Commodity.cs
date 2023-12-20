@@ -9,6 +9,7 @@ namespace TaniLink_Backend.Models
         public string? Name { get; set; }
         public string? Image { get; set; }
         public string? Description { get; set; }
+        public bool IsDatasetChanged { get; set; }
         public ICollection<Area>? Areas { get; set; }
         public ICollection<Product>? Products { get; set; }
         public ICollection<Prediction>? Predictions { get; set; }
