@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option csharp_namespace = "TaniLink_Backend";
+
+package prediction_proto;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service Predictions {
+  rpc GetPredictions (PredictionReq) returns (AllPredictionDetail);
+}
+
+message PredictionReq {
+	string CommodityId = 1;
+	string AreaId = 2;
+	string Date = 3; // mm/yyyy
+}
+
+message AllPredictionDetail {
+	repeated PredictionDetail Predictions = 1;
+}
+
+message PredictionDetail {
+	string Id = 1;
+	string Price = 2;
+	string Date = 3; // mm/dd/yyyy
+	string CommodityId = 4;
+	google.protobuf.Timestamp CreatedAt = 5;
+	google.protobuf.Timestamp UpdatedAt = 6;
+	google.protobuf.Timestamp DeletedAt = 7;
+}

@@ -14,3 +14,4 @@ services:
       - Jwt__Audience=${JWT_AUDIENCE}
       - Jwt__DurationInDay=${JWT_DURATION_IN_DAY}
       - MailTrap__Key=${MAILTRAP}
+      - ApiUrls__Prediction=${PREDICTION_API}

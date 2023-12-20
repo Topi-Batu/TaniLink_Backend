@@ -31,10 +31,14 @@ services:
     depends_on:
       - tanilink-db
     restart: always
+    environment:
+      - DATABASE_URI=${PY_DATABASE_URI}
+      - STORAGE_URI=${STORAGE_URI}
     networks:
       - tanilink-network
 
   tanilink_backend:
+    container_name: tanilink-backend
     image: ${DOCKER_REGISTRY-}tanilinkbackend
     build:
       context: .

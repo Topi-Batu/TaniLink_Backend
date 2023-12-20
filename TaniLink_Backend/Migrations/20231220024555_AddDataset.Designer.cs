@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaniLink_Backend.Data;
 
@@ -11,9 +12,11 @@ using TaniLink_Backend.Data;
 namespace TaniLink_Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231220024555_AddDataset")]
+    partial class AddDataset
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -316,6 +319,9 @@ namespace TaniLink_Backend.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("UsedDataset")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Commodities");
@@ -375,6 +381,34 @@ namespace TaniLink_Backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ConversationMembers");
+                });
+
+            modelBuilder.Entity("TaniLink_Backend.Models.Dataset", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CommodityId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Link")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommodityId");
+
+                    b.ToTable("Datasets");
                 });
 
             modelBuilder.Entity("TaniLink_Backend.Models.Invoice", b =>
@@ -533,68 +567,6 @@ namespace TaniLink_Backend.Migrations
                     b.HasIndex("CommodityId");
 
                     b.ToTable("Predictions");
-                });
-
-            modelBuilder.Entity("TaniLink_Backend.Models.PredictionDataset", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CommodityId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("DatasetLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommodityId");
-
-                    b.ToTable("PredictionDatasets");
-                });
-
-            modelBuilder.Entity("TaniLink_Backend.Models.PredictionModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CommodityId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModelLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommodityId");
-
-                    b.ToTable("PredictionModels");
                 });
 
             modelBuilder.Entity("TaniLink_Backend.Models.Product", b =>
@@ -985,6 +957,16 @@ namespace TaniLink_Backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TaniLink_Backend.Models.Dataset", b =>
+                {
+                    b.HasOne("TaniLink_Backend.Models.Commodity", "Commodity")
+                        .WithMany("Datasets")
+                        .HasForeignKey("CommodityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Commodity");
+                });
+
             modelBuilder.Entity("TaniLink_Backend.Models.Message", b =>
                 {
                     b.HasOne("TaniLink_Backend.Models.Conversation", "Conversation")
@@ -1026,26 +1008,6 @@ namespace TaniLink_Backend.Migrations
                 {
                     b.HasOne("TaniLink_Backend.Models.Commodity", "Commodity")
                         .WithMany("Predictions")
-                        .HasForeignKey("CommodityId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Commodity");
-                });
-
-            modelBuilder.Entity("TaniLink_Backend.Models.PredictionDataset", b =>
-                {
-                    b.HasOne("TaniLink_Backend.Models.Commodity", "Commodity")
-                        .WithMany("PredictionDatasets")
-                        .HasForeignKey("CommodityId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Commodity");
-                });
-
-            modelBuilder.Entity("TaniLink_Backend.Models.PredictionModel", b =>
-                {
-                    b.HasOne("TaniLink_Backend.Models.Commodity", "Commodity")
-                        .WithMany("PredictionModels")
                         .HasForeignKey("CommodityId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -1127,9 +1089,7 @@ namespace TaniLink_Backend.Migrations
 
             modelBuilder.Entity("TaniLink_Backend.Models.Commodity", b =>
                 {
-                    b.Navigation("PredictionDatasets");
-
-                    b.Navigation("PredictionModels");
+                    b.Navigation("Datasets");
 
                     b.Navigation("Predictions");
 

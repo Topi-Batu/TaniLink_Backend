@@ -12,5 +12,7 @@ namespace TaniLink_Backend.Models
         public ICollection<Area>? Areas { get; set; }
         public ICollection<Product>? Products { get; set; }
         public ICollection<Prediction>? Predictions { get; set; }
+        public ICollection<PredictionDataset>? PredictionDatasets { get; set; }
+        public ICollection<PredictionModel>? PredictionModels { get; set; }
     }
 }

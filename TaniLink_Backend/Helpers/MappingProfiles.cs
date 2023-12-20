@@ -103,6 +103,20 @@ namespace TaniLink_Backend.Helpers
                     opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.DeletedAt.Value));
                 })
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null && !string.IsNullOrEmpty(srcMember.ToString())));
+
+            CreateMap<Prediction, PredictionDetail>()
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date.ToString()))
+                .ForMember(dest => dest.CommodityId, opt => opt.MapFrom(src => src.Commodity.Id))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.CreatedAt)))
+                .ForMember(dest => dest.UpdatedAt, opt => {
+                    opt.PreCondition(src => src.UpdatedAt != null);
+                    opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.UpdatedAt.Value));
+                })
+                .ForMember(dest => dest.DeletedAt, opt => {
+                    opt.PreCondition(src => src.DeletedAt != null);
+                    opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.DeletedAt.Value));
+                })
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null && !string.IsNullOrEmpty(srcMember.ToString())));
         }
     }
 }

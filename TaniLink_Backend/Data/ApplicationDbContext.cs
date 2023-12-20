@@ -14,6 +14,8 @@ namespace TaniLink_Backend.Data
         public DbSet<Area> Areas { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Commodity> Commodities { get; set; }
+        public DbSet<PredictionDataset> PredictionDatasets { get; set; }
+        public DbSet<PredictionModel> PredictionModels { get; set; }
         public DbSet<Prediction> Predictions { get; set; }
         public DbSet<Seller> Sellers { get; set; }
         public DbSet<Product> Products { get; set; }

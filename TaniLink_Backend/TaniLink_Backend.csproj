@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="Protos\account_proto.proto" />
     <None Remove="Protos\marketplace_proto.proto" />
+    <None Remove="Protos\prediction_proto.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,8 +36,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Protobuf Include="Protos\prediction_proto.proto" />
     <Protobuf Include="Protos\marketplace_proto.proto" />
     <Protobuf Include="Protos\account_proto.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\predictions\datasets\" />
+    <Folder Include="wwwroot\predictions\models\" />
   </ItemGroup>
 
 </Project>
