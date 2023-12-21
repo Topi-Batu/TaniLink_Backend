@@ -123,6 +123,7 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 app.MapGrpcService<AccountService>();
 app.MapGrpcService<MarketplaceService>();
+app.MapGrpcService<PredictionService>();
 
 app.UseAuthorization();
 

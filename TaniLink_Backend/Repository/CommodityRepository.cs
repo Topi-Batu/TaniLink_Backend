@@ -52,6 +52,7 @@ namespace TaniLink_Backend.Repository
         {
             var commodity = await _context.Commodities
                 .Include(c => c.Areas)
+                .Include(c => c.PredictionDatasets)
                 .FirstOrDefaultAsync(c => c.Id == commodityId);
             return commodity;
         }

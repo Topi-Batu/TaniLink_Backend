@@ -40,6 +40,37 @@ namespace TaniLink_Backend.Repository
             return prediction;
         }
 
+        /*public async Task<IEnumerable<Prediction>> GetAllPredictionByCommodityIdAndAreaId(string commodityId, string areaId)
+        {
+            var predictions = await _context.Predictions
+                .Include(p => p.Commodity)
+                .Include(p => p.Areas)
+                .Where(p => p.Commodity.Id == commodityId && p.Areas.Any(a => a.Id == areaId))
+                .ToListAsync();
+            return predictions;
+        }*/
+
+        public async Task<IEnumerable<Prediction>> GetAllPredictionByCommodityIdAndAreaIdAndMonthAndYear(string commodityId, string areaId, DateOnly dateOnly)
+        {
+            var predictions = await _context.Predictions
+                .Include(p => p.Commodity)
+                .Include(p => p.Areas)
+                .Where(p => p.Commodity.Id == commodityId && p.Areas.Any(a => a.Id == areaId) && p.Date.Month == dateOnly.Month && p.Date.Year == dateOnly.Year)
+                .OrderBy(p => p.Date)
+                .ToListAsync();
+            return predictions;
+        }
+
+        /*public async Task<IEnumerable<Prediction>> GetAllPredictionByMonthAndYear(DateOnly dateOnly)
+        {
+            var predictions = await _context.Predictions
+                .Include(p => p.Commodity)
+                .Where(p => p.Date.Month == dateOnly.Month && p.Date.Year == dateOnly.Year)
+                .OrderBy(p => p.Date)
+                .ToListAsync();
+            return predictions;
+        }*/
+
         public async Task<IEnumerable<Prediction>> GetAllPredictions()
         {
             var predictions = await _context.Predictions
@@ -48,11 +79,28 @@ namespace TaniLink_Backend.Repository
             return predictions;
         }
 
+        public async Task<Prediction> GetByPredictionDate(DateOnly predictionDate)
+        {
+            var prediction = await _context.Predictions
+                .Include(p => p.Commodity)
+                .FirstOrDefaultAsync(p => p.Date == predictionDate);
+            return prediction;
+        }
+
         public Task<Prediction> GetByPredictionId(string predictionId)
         {
             var prediction = _context.Predictions
                 .Include(p => p.Commodity)
                 .FirstOrDefaultAsync(p => p.Id == predictionId);
+            return prediction;
+        }
+
+        public Task<Prediction> GetLatestPrediction()
+        {
+            var prediction = _context.Predictions
+                .Include(p => p.Commodity)
+                .OrderByDescending(p => p.Date)
+                .FirstOrDefaultAsync();
             return prediction;
         }
 

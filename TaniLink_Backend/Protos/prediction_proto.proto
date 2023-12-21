@@ -14,7 +14,7 @@ service Predictions {
 message PredictionReq {
 	string CommodityId = 1;
 	string AreaId = 2;
-	string Date = 3; // mm/yyyy
+	string Date = 3; // dd/mm/yyyy
 }
 
 message AllPredictionDetail {
@@ -24,7 +24,7 @@ message AllPredictionDetail {
 message PredictionDetail {
 	string Id = 1;
 	string Price = 2;
-	string Date = 3; // mm/dd/yyyy
+	string Date = 3; // dd/mm/yyyy
 	string CommodityId = 4;
 	google.protobuf.Timestamp CreatedAt = 5;
 	google.protobuf.Timestamp UpdatedAt = 6;
