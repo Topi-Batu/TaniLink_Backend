@@ -1,0 +1,224 @@
+﻿@model ProductViewModel;
+@using TaniLink_Backend.ViewModels;
+
+@{
+    ViewData["Title"] = "Product";
+    var product = ViewBag.Product as Product;
+    var Commodities = (IEnumerable<Commodity>)ViewBag.Commodities;
+    var Areas = (IEnumerable<Area>)ViewBag.Areas;
+}
+<div class="mb-3">
+    <a asp-area="Dashboard" asp-controller="Product" asp-action="Index" class="btn btn-info"><i class="fas fa-fw fa-arrow-circle-left"></i> Kembali</a>
+    @* <a asp-area="Dashboard" asp-controller="Product" asp-action="BuyerList" asp-route-productId="@product.Id" class="btn btn-warning"><i class="fas fa-fw fa-users"></i> Lihat Pembeli</a> *@
+    <button type="button" id="btn-delete" class="btn btn-danger"><i class="fas fa-fw fa-trash"></i> Hapus Product</button>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Product Info</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-primary btn-xs" title="Edit Product Detail" data-toggle="modal" data-target="#modal-edit-Product">
+                <i class="fas fa-fw fa-edit"></i> Edit Product
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="form-group row">
+            <label class="col-lg-3 col-form-label" for="user_id">ID</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control" readonly="" value="@product.Id">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-lg-3 col-form-label" for="title">Nama Product</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control" readonly="" value="@product.Name">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-lg-3 col-form-label" for="description">Deskripsi</label>
+            <div class="col-lg-6">
+                <textarea cols="30" rows="3" class="form-control" readonly="">@product.Description</textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-lg-3 col-form-label" for="title">Price</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control" readonly="" value="@product.Price">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-lg-3 col-form-label" for="title">UnitName</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control" readonly="" value="@product.UnitName">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-lg-3 col-form-label" for="title">Stok</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control" readonly="" value="@product.AvailableStock">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-lg-3 col-form-label" for="title">Komoditas</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control" readonly="" value="@product.Commodity.Name">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-lg-3 col-form-label" for="title">Area</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control" readonly="" value="@product.Area.Kecamatan">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-edit-Product">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Product Detail</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-area="Dashboard" asp-controller="Product" asp-action="Update" asp-route-productId="@product.Id" method="post" role="form">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Nama Produk</label>
+                        <div class="col-lg-6">
+                            <input asp-for="Name" class="form-control" value="@product.Name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="description">Deskripsi</label>
+                        <div class="col-lg-6">
+                            @Html.TextArea("Description", product.Description, rows: 3, columns: 30, new { @class = "form-control", placeholder = "Deskripsi" })
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Price</label>
+                        <div class="col-lg-6">
+                            <input asp-for="Price" class="form-control" value="@product.Price">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Satuan Produk (kg/liter)</label>
+                        <div class="col-lg-6">
+                            <input asp-for="UnitName" class="form-control" value="@product.UnitName">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Available Stock</label>
+                        <div class="col-lg-6">
+                            <input asp-for="AvailableStock" class="form-control" value="@product.AvailableStock">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Komoditas</label>
+                        <div class="col-lg-6">
+                            <select asp-for="CommodityId" class="custom-select">
+                                <option selected disabled>Pilih Komoditas</option>
+                                @foreach (var commodity in Commodities)
+                                {
+                                    <option value="@commodity.Id" selected="@(product.Commodity.Id == commodity.Id ? "selected" : null )">@commodity.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Area</label>
+                        <div class="col-lg-6">
+                            <select asp-for="AreaId" class="custom-select">
+                                <option selected disabled>Pilih Area</option>
+                                @foreach (var area in Areas)
+                                {
+                                    <option value="@area.Id" selected="@(product.Area.Id == area.Id ? "selected" : null )">@area.Kecamatan, @area.Kota, @area.Provinsi</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/plugins/moment/moment.min.js"></script>
+<script src="~/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#Product_open_at').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm:ss',
+            useCurrent: false,
+            icons: {
+                time: 'far fa-clock'
+            }
+        });
+        $('#Product_closed_at').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm:ss',
+            useCurrent: false,
+            icons: {
+                time: 'far fa-clock'
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#btn-delete').on('click', function () {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Apakah anda yakin?',
+                text: 'Product yang dihapus tidak bisa dipulihkan',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Content("~/")Dashboard/Product/@product.Id',
+                        method: 'DELETE',
+                        success: (result) => {
+                            if (result.ok) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil',
+                                    text: 'Product @product.Name berhasil dihapus'
+                                }).then(() => {
+                                    window.location.replace("/Dashboard/Product");
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: result.message
+                                });
+                            }
+                        },
+                        error: (err) => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: err.statusText
+                            });
+                        }
+                    })
+
+                }
+            })
+        })
+    })
+</script>

@@ -1,0 +1,181 @@
+﻿@model ProductViewModel;
+@using TaniLink_Backend.ViewModels;
+
+@{
+    var Products = (IEnumerable<Product>)ViewBag.Products;
+    var Commodities = (IEnumerable<Commodity>)ViewBag.Commodities;
+    var Areas = (IEnumerable<Area>)ViewBag.Areas;
+    var no = 1;
+}
+
+
+<button type="button" class="btn btn-primary mb-2" title="Tambah Produk" data-toggle="modal" data-target="#modal-add-product">
+    <i class="fas fa-fw fa-plus-circle"></i> Tambah
+</button>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Daftar Produk</h3>
+
+        <div class="card-tools">
+            <div class="input-group input-group-sm" style="width: 150px;">
+                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-default">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body table-responsive p-0">
+        <table class="table table-hover text-nowrap">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Komoditas</th>
+                    <th>Harga</th>
+                    <th>Stok</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Products.Any())
+                {
+
+                    <tr>
+                        <td>
+                            <h1>Tidak ada data</h1>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Products)
+                    {
+                        <tr>
+                            <td>@no</td>
+                            <td><a asp-area="Dashboard" asp-controller="Product" asp-action="Detail" asp-route-productId="@item.Id"><b>@item.Name</b></a></td>
+                            <td>@item.Commodity?.Name</td>
+                            <td>@item.Price</td>
+                            <td>@item.AvailableStock</td>
+                            <td><img src="@item.Images?.FirstOrDefault()?.Image" width="100" height="100" /></td>
+                        </tr>
+                        no++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->
+
+<div class="modal fade" id="modal-add-product">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h4 class="modal-title">Tambah Produk</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-area="Dashboard" asp-controller="Product" asp-action="Create" method="post" role="form">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Nama Produk</label>
+                        <div class="col-lg-6">
+                            <input asp-for="Name" class="form-control" placeholder="Nama Produk">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="description">Deskripsi</label>
+                        <div class="col-lg-6">
+                            @Html.TextArea("Description", null, rows: 3, columns: 30, new { @class = "form-control", placeholder = "Deskripsi" })
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Price</label>
+                        <div class="col-lg-6">
+                            <input asp-for="Price" class="form-control" placeholder="Price">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Satuan Produk (kg/liter)</label>
+                        <div class="col-lg-6">
+                            <input asp-for="UnitName" class="form-control" placeholder="Unit Name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Link Gambar</label>
+                        <div class="col-lg-6">
+                            <input asp-for="Thumbnail" class="form-control" placeholder="Link Gambar">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Available Stock</label>
+                        <div class="col-lg-6">
+                            <input asp-for="AvailableStock" class="form-control" placeholder="Available Stock">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Komoditas</label>
+                        <div class="col-lg-6">
+                            <select asp-for="CommodityId" class="custom-select">
+                                <option selected disabled>Pilih Komoditas</option>
+                                @foreach (var commodity in Commodities)
+                                {
+                                    <option value="@commodity.Id">@commodity.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label" for="title">Area</label>
+                        <div class="col-lg-6">
+                            <select asp-for="AreaId" class="custom-select">
+                                <option selected disabled>Pilih Area</option>
+                                @foreach (var area in Areas)
+                                {
+                                    <option value="@area.Id">@area.Kecamatan, @area.Kota, @area.Provinsi</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script src="~/plugins/moment/moment.min.js"></script>
+<script src="~/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#competition_open_at').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm:ss',
+            useCurrent: false,
+            icons: {
+                time: 'far fa-clock'
+            }
+        });
+        $('#competition_closed_at').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm:ss',
+            useCurrent: false,
+            icons: {
+                time: 'far fa-clock'
+            }
+        });
+    });
+</script>

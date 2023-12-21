@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Product Details";
+
+}
+
+@Html.Partial("_Partials/Breadcrumb")
+
+<section class="content">
+    <div class="container-fluid">
+        @await Html.PartialAsync("_Partials/ProductDetail")
+        @* <div class="row">
+
+            <section class="col-lg-6 connectedSortable">
+                @await Html.PartialAsync("_Partials/TeamAdditionalEntity")
+            </section>
+
+            <section class="col-lg-6 connectedSortable">
+                @await Html.PartialAsync("_Partials/MemberAdditionalEntity")
+            </section>
+
+        </div> *@
+        @* @await Html.PartialAsync("_Partials/CompetitionTable")*@
+    </div>
+</section>

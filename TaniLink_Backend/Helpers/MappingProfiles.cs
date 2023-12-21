@@ -2,6 +2,7 @@
 using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using TaniLink_Backend.Models;
+using TaniLink_Backend.ViewModels;
 
 namespace TaniLink_Backend.Helpers
 {
@@ -117,6 +118,13 @@ namespace TaniLink_Backend.Helpers
                     opt.MapFrom(src => Timestamp.FromDateTimeOffset(src.DeletedAt.Value));
                 })
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null && !string.IsNullOrEmpty(srcMember.ToString())));
+
+
+
+
+
+
+            CreateMap<ProductViewModel, Product>();
         }
     }
 }

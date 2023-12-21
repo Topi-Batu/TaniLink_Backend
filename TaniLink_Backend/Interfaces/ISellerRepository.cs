@@ -6,6 +6,7 @@ namespace TaniLink_Backend.Interfaces
     {
         Task<IEnumerable<Seller>> GetAllSellers();
         Task<Seller> GetSellerById(string sellerId);
+        Task<Seller> GetSellerByUserId(string userId);
         Task<Seller> CreateSeller(Seller seller);
         Task<Seller> UpdateSeller(Seller seller);
         Task<Seller> DeleteSeller(string sellerId);

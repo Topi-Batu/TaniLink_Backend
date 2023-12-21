@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Product";
+}
+
+@Html.Partial("_Partials/Breadcrumb")
+
+<section class="content">
+    <div class="container-fluid">
+        @await Html.PartialAsync("_Partials/ProductTable")
+    </div>
+</section>
+
+

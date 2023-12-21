@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TaniLink_Backend;
@@ -17,12 +18,23 @@ builder.Services.AddLogging(builder =>
     builder.AddConsole();
 });
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<RazorViewEngineOptions>(options =>
+{
+    options.AreaViewLocationFormats.Clear();
+    options.AreaViewLocationFormats.Add("/Views/{2}/{1}/{0}.cshtml");
+    options.AreaViewLocationFormats.Add("/Views/{2}/Shared/{0}.cshtml");
+    options.AreaViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+
+    // Menambahkan lokasi pencarian shared views
+    options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+});
 builder.Services.AddGrpc();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 builder.Services.AddScoped<ICommodityRepository, CommodityRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ISellerRepository, SellerRepository>();
 builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
@@ -51,6 +63,12 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/User/Login";
+    options.AccessDeniedPath = "/Home/AccessDenied";
+});
 
 builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
@@ -131,5 +149,10 @@ app.MapHub<ChatHub>("/ChatHub");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapAreaControllerRoute(
+        name: "dashboard",
+        areaName: "Dashboard",
+        pattern: "Dashboard/{controller=Home}/{action=Index}/{id?}");
 
 await app.RunAsync();
