@@ -75,6 +75,7 @@ namespace TaniLink_Backend.Repository
         {
             var predictions = await _context.Predictions
                 .Include(p => p.Commodity)
+                .Include(p => p.Areas)
                 .ToListAsync();
             return predictions;
         }
@@ -83,6 +84,7 @@ namespace TaniLink_Backend.Repository
         {
             var prediction = await _context.Predictions
                 .Include(p => p.Commodity)
+                .Include(p => p.Areas)
                 .FirstOrDefaultAsync(p => p.Date == predictionDate);
             return prediction;
         }
@@ -91,16 +93,18 @@ namespace TaniLink_Backend.Repository
         {
             var prediction = _context.Predictions
                 .Include(p => p.Commodity)
+                .Include(p => p.Areas)
                 .FirstOrDefaultAsync(p => p.Id == predictionId);
             return prediction;
         }
 
-        public Task<Prediction> GetLatestPrediction()
+        public Task<Prediction> GetLatestPredictionByCommodityIdAndAreaId(string commodityId, string areaId)
         {
             var prediction = _context.Predictions
                 .Include(p => p.Commodity)
+                .Include(p => p.Areas)
                 .OrderByDescending(p => p.Date)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(p => p.Commodity.Id == commodityId && p.Areas.Any(a => a.Id == areaId));
             return prediction;
         }
 

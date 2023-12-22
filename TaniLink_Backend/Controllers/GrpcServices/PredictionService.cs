@@ -52,14 +52,14 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                 if (!areas.Any())
                     throw new RpcException(new Status(StatusCode.NotFound, "Areas not found"));
 
-                var latestPrediction = await _predictionRepository.GetLatestPrediction();
+                var latestPrediction = await _predictionRepository.GetLatestPredictionByCommodityIdAndAreaId(request.CommodityId, request.AreaId);
                 if (latestPrediction == null)
                     throw new RpcException(new Status(StatusCode.NotFound, "Latest prediction not found"));
 
                 var requestDate = DateOnly.Parse(request.Date);
-                if (requestDate.DayNumber > latestPrediction.Date.DayNumber)
+                if (requestDate.DayNumber+35 > latestPrediction.Date.DayNumber)
                 {
-                    int num = requestDate.DayNumber - latestPrediction.Date.DayNumber;
+                    int num = requestDate.DayNumber+35 - latestPrediction.Date.DayNumber;
 
                     var baseUri = _configuration["ApiUrls:Prediction"];
                     RestClient client = new RestClient(new RestClientOptions
@@ -67,7 +67,7 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                         BaseUrl = new Uri(baseUri),
                     });
 
-                    var apiReq = new RestRequest($"predictions/{request.CommodityId}/{num+30}");
+                    var apiReq = new RestRequest($"predictions/{request.CommodityId}/{num+31}");
                     var result = await client.GetAsync<Dictionary<string, string>>(apiReq);
 
                     foreach (var item in result)
@@ -77,7 +77,6 @@ namespace TaniLink_Backend.Controllers.GrpcServices
                         {
                             prediction.Price = item.Value;
                             prediction.Commodity = commodity;
-                            prediction.Areas = areas.ToList();
 
                             var update = await _predictionRepository.UpdatePrediction(prediction);
                             if (update == null)

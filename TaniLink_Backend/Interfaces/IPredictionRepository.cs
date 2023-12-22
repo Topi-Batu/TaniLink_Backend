@@ -8,7 +8,7 @@ namespace TaniLink_Backend.Interfaces
         Task<IEnumerable<Prediction>> GetAllPredictionByCommodityIdAndAreaIdAndMonthAndYear(string commodityId, string areaId, DateOnly dateOnly);
         Task<Prediction> GetByPredictionId(string predictionId);
         Task<Prediction> GetByPredictionDate(DateOnly predictionDate);
-        Task<Prediction> GetLatestPrediction();
+        Task<Prediction> GetLatestPredictionByCommodityIdAndAreaId(string commodityId, string areaId);
         Task<Prediction> CreatePrediction(Prediction prediction);
         Task<Prediction> UpdatePrediction(Prediction prediction);
         Task<Prediction> DeletePrediction(string predictionId);
