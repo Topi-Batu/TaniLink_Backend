@@ -23,7 +23,7 @@ jobs:
 
       - name: Replace appsettings
         run: |
-          echo "${{ vars.APP_SETTINGS }}" > ./TaniLink_Backend/appsettings.json
+          echo '${{ vars.APP_SETTINGS }}' > ./TaniLink_Backend/appsettings.json
 
       - name: Build with dotnet
         run: dotnet build .\TaniLink_Backend\TaniLink_Backend.csproj --configuration Release
